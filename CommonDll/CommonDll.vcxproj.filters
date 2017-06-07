@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Reg">
+      <UniqueIdentifier>{9b57be9a-6fe3-41ef-89b1-5521ae997c31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Reg">
+      <UniqueIdentifier>{982eea16-f883-454b-9938-6951f1cef861}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -22,6 +28,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Reg\RegOperation.h">
+      <Filter>Header Files\Reg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\DllExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,5 +47,13 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RegOperation.cpp">
+      <Filter>Source Files\Reg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CommonDll.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
