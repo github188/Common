@@ -2,14 +2,18 @@
 //
 
 #include "stdafx.h"
-#include "Reg\RegOperation.h"
+#include "TestFunction.h"
+
+#define _TEST_REG_
 
 
 int main()
 {
-	BOOL bRet = CRegOperation::RegWriteDword(HKEY_LOCAL_MACHINE,
-		_T("SOFTWARE\\HQW"), _T("Test"), 3);
-	
+#ifdef _TEST_REG_
+	TestReg();
+#endif // _TEST_REG_
+
+	system("pause");
 	return 0;
 }
 
