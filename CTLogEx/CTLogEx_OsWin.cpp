@@ -39,7 +39,7 @@ Log_OsShowError(wchar_t *fmt, ...)
     vswprintf(szmsg, sizeof(szmsg)/sizeof(szmsg[0]), fmt, args);
     va_end(args);
 
-    swprintf(out, sizeof(szmsg)/sizeof(szmsg[0]), L"Centerm log module: %s", szmsg);
+    swprintf(out, sizeof(szmsg)/sizeof(szmsg[0]), L"log module: %s", szmsg);
     OutputDebugString(out);
 }
 
