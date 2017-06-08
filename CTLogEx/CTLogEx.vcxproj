@@ -185,6 +185,7 @@
     <None Include="CTLogEx_x64.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\inc\CTLogEx\CTLogEx.h" />
     <ClInclude Include="CTLogEx_OsWin.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
