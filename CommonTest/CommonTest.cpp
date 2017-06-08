@@ -6,6 +6,7 @@
 
 #define _TEST_LOG_
 //#define _TEST_REG_
+#define _TEST_WIN_UTILS_
 
 
 int main()
@@ -15,9 +16,14 @@ int main()
 	TestLog();
 #endif // _TEST_LOG_
 
-#ifdef _TEST_REG_
+#ifdef _TEST_LOG_
 	TestReg();
 #endif // _TEST_REG_
+
+#ifdef _TEST_WIN_UTILS_
+	TestWinUtils();
+#endif // _TEST_WIN_UTILS
+
 
 	system("pause");
 	return 0;

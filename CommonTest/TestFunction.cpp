@@ -3,6 +3,7 @@
 #include "Reg\RegOperation.h"
 #include "CTLogEx\CTLogEx.h"
 #include "Log\LogExBase.h"
+#include "Utils\WinUtils.h"
 
 #define MODULE_NAME		L"TestFunction"
 
@@ -58,4 +59,16 @@ void TestReg()
 		return;
 	}
 	free(szString);
+}
+
+//Windows³£ÓÃ²Ù×÷
+void TestWinUtils()
+{
+	BOOL bRet = FALSE;
+
+	int numOfNic = 0;
+	std::vector<BYTE> mac;
+	bRet = CWinUtils::GetMacAddr(&numOfNic, mac);
+
+	int k = 0;
 }

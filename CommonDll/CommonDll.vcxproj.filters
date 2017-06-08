@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Log">
       <UniqueIdentifier>{45824cf7-c5de-4fd4-b8e3-bdebe933ce3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{57d1d8e1-aced-40e3-9fa0-3005d55f718a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{a121abc9-e931-4878-8553-b431638fab7b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -42,6 +48,12 @@
     <ClInclude Include="..\inc\Log\LogExBase.h">
       <Filter>Header Files\Log</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Utils\WinUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\CTUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -55,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Log\LogExBase.cpp">
       <Filter>Source Files\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utils\WinUtils.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
