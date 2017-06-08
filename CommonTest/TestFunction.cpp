@@ -92,6 +92,7 @@ void TestWinUtils()
 	std::wstring processName = CWinUtils::GetCurrentProcessName();
 
 	std::wstring errorMsg = CWinUtils::GetErrorMsg(GetLastError());
+	std::wstring errorMsg2 = CWinUtils::WIN32_ERROR_STRING;
 
 	int k = 0;
 }
