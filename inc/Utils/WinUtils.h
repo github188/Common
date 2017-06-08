@@ -118,8 +118,8 @@ public:
 	*/
 	static DLL_COMMONLIB_API tstring WINAPI GetErrorMsg(DWORD errorCode);
 
-#define WIN32_ERROR_STRING XGetErrorMsg(GetLastError()).c_str()
-#define WINNET_ERROR_STRING XGetErrorMsg(WSAGetLastError()).c_str()
+#define WIN32_ERROR_STRING GetErrorMsg(GetLastError()).c_str()
+#define WINNET_ERROR_STRING GetErrorMsg(WSAGetLastError()).c_str()
 
 
 };
