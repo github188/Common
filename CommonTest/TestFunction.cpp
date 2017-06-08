@@ -65,10 +65,33 @@ void TestReg()
 void TestWinUtils()
 {
 	BOOL bRet = FALSE;
+	DWORD dwRet = 0;
 
 	int numOfNic = 0;
 	std::vector<BYTE> mac;
 	bRet = CWinUtils::GetMacAddr(&numOfNic, mac);
+
+	char hostName[32] = { 0 };
+	bRet = CWinUtils::GetHostname(hostName);
+
+	bRet = CWinUtils::IsAdminMode();
+
+	bRet = CWinUtils::IsFullpath(_T("1.txt"));
+	bRet = CWinUtils::IsFullpath(_T("C:\\1.txt"));
+
+	std::wstring userName = _T("");
+	dwRet = CWinUtils::GetSessionID();
+	if (dwRet > 0)
+	{
+		bRet = CWinUtils::GetSessionUserName(dwRet, userName);
+	}
+
+	std::string ansi = CWinUtils::Wchar2Ansi(userName.c_str());
+	std::wstring wchar = CWinUtils::Ansi2WideString(ansi.c_str());
+
+	std::wstring processName = CWinUtils::GetCurrentProcessName();
+
+	std::wstring errorMsg = CWinUtils::GetErrorMsg(GetLastError());
 
 	int k = 0;
 }
