@@ -2,5 +2,5 @@
 
 
 
-
+void TestLog();
 void TestReg();

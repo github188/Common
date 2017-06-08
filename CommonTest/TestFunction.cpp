@@ -1,6 +1,22 @@
 #include "TestFunction.h"
 #include "stdafx.h"
 #include "Reg\RegOperation.h"
+#include "CTLogEx\CTLogEx.h"
+
+#define MODULE_NAME		L"TestFunction"
+
+//日志操作
+void TestLog()
+{
+	CTLogEx_init(_T("CommonTest_logconf.ini"));
+
+	L_INFO(_T("test info, total time = %d \r\n"), GetTickCount());
+	L_ERROR(_T("test log type： %s\n"), _T("error"));
+	L_DEBUG(_T("test debug\n"));
+	L_TRACE_ENTER();
+	L_TRACE(_T("test trace\n"));
+	L_TRACE_LEAVE();
+}
 
 //注册表操作
 void TestReg()
