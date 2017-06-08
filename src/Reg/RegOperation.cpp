@@ -4,7 +4,6 @@
 #include <WtsApi32.h>
 #include <UserEnv.h>
 #include "Reg\RegOperation.h"
-#pragma comment(lib, "wtsapi32.lib")
 
 BOOL CRegOperation::RegReadDword(HKEY Key, const CHAR *Subkeyname, const CHAR *ValueName, 
     DWORD *Value, DWORD DefaultVal)
