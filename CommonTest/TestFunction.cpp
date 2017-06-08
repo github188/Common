@@ -2,20 +2,28 @@
 #include "stdafx.h"
 #include "Reg\RegOperation.h"
 #include "CTLogEx\CTLogEx.h"
+#include "Log\LogExBase.h"
 
 #define MODULE_NAME		L"TestFunction"
 
 //日志操作
 void TestLog()
 {
+	//直接调用 CTLogEx
 	CTLogEx_init(_T("CommonTest_logconf.ini"));
-
 	L_INFO(_T("test info, total time = %d \r\n"), GetTickCount());
 	L_ERROR(_T("test log type： %s\n"), _T("error"));
 	L_DEBUG(_T("test debug\n"));
 	L_TRACE_ENTER();
 	L_TRACE(_T("test trace\n"));
 	L_TRACE_LEAVE();
+	
+	//基于二次封装的 CommonDll
+	CLogEx::LogInitW(_T("CommonTest_logconf.ini"));
+	LOG_INFO(_T("CommonDll Log info\n"));
+	LOG_ERROR(_T("CommonDll Log error\n"));
+	LOG_DEBUG(_T("CommonDll Log debug\n"));
+	CLogEx::LogDone();
 }
 
 //注册表操作

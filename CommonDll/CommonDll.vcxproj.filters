@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Reg">
       <UniqueIdentifier>{982eea16-f883-454b-9938-6951f1cef861}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Log">
+      <UniqueIdentifier>{508faa11-b50f-4ed7-9387-708f1e82c8ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Log">
+      <UniqueIdentifier>{45824cf7-c5de-4fd4-b8e3-bdebe933ce3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -33,6 +39,9 @@
     <ClInclude Include="..\inc\DllExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Log\LogExBase.h">
+      <Filter>Header Files\Log</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -43,6 +52,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Reg\RegOperation.cpp">
       <Filter>Source Files\Reg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Log\LogExBase.cpp">
+      <Filter>Source Files\Log</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
