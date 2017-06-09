@@ -4,6 +4,8 @@
 #include "CTLogEx\CTLogEx.h"
 #include "Log\LogExBase.h"
 #include "Utils\WinUtils.h"
+#include "Utils\StringUtils.h"
+#include "Utils\Base64Utils.h"
 
 #define MODULE_NAME		L"TestFunction"
 
@@ -38,9 +40,8 @@ void TestReg()
 	DWORD dwLen = 0;
 	TCHAR* szString;
 
-
 	bRet = CRegOperation::RegWriteDword(HKEY_LOCAL_MACHINE, keyPath.c_str(), keyDword.c_str(), 10);
-	bRet = CRegOperation::RegWriteString(HKEY_LOCAL_MACHINE, keyPath.c_str(), keyString.c_str(), _T("huangqiwei"));
+	bRet = CRegOperation::RegWriteString(HKEY_LOCAL_MACHINE, keyPath.c_str(), keyString.c_str(), _T("hello world"));
 	bRet = CRegOperation::RegReadDword(HKEY_LOCAL_MACHINE, keyPath.c_str(), keyDword.c_str(), &dwRet, 99);
 
 	//¶ÁÈ¡×Ö·û´®
@@ -67,6 +68,7 @@ void TestWinUtils()
 	BOOL bRet = FALSE;
 	DWORD dwRet = 0;
 
+	//WinUtils
 	int numOfNic = 0;
 	std::vector<BYTE> mac;
 	bRet = CWinUtils::GetMacAddr(&numOfNic, mac);
@@ -94,5 +96,20 @@ void TestWinUtils()
 	std::wstring errorMsg = CWinUtils::GetErrorMsg(GetLastError());
 	std::wstring errorMsg2 = CWinUtils::WIN32_ERROR_STRING;
 
-	int k = 0;
+	//StringUtils
+	std::string newS = CStringUtils::ToUpper("helWor");
+
+	//Base64Utils
+	std::string base64Str = "";
+	char inData[32] = "hello world";
+	CBase64Utils::Encode(inData, 12, base64Str);
+	int len = 0;
+	CBase64Utils::Decode(base64Str, len, NULL);
+	char *outdata = new char[len];
+	CBase64Utils::Decode(base64Str, len, outdata);
+	std::string outStr = outdata;
+	if (NULL != outdata)
+	{
+		delete []outdata;
+	}
 }

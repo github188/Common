@@ -163,6 +163,8 @@
     <ClInclude Include="..\inc\DllExport.h" />
     <ClInclude Include="..\inc\Log\LogExBase.h" />
     <ClInclude Include="..\inc\Reg\RegOperation.h" />
+    <ClInclude Include="..\inc\Utils\Base64Utils.h" />
+    <ClInclude Include="..\inc\Utils\StringUtils.h" />
     <ClInclude Include="..\inc\Utils\WinUtils.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -172,6 +174,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\Reg\RegOperation.cpp" />
+    <ClCompile Include="..\src\Utils\Base64Utils.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\Utils\StringUtils.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\src\Utils\WinUtils.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
