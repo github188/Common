@@ -5,6 +5,9 @@
 #include <WtsApi32.h>
 #include "CTUtils.h"
 #include "Utils\WinUtils.h"
+#include "Utils\StringUtils.h"
+#include "Shlwapi.h"
+#pragma comment (lib,"Shlwapi.lib")
 
 BOOL CWinUtils::GetMacAddr(int *numOfNic, std::vector<BYTE> &mac)
 {
@@ -274,6 +277,16 @@ tstring CWinUtils::GetCurrentProcessName()
 	return processName;
 }
 
+void CWinUtils::GetCurrentProcessPath(std::wstring& path)
+{
+	wchar_t wsPath[MAX_PATH] = { 0 };
+	if (GetModuleFileName(NULL, wsPath, MAX_PATH))
+	{
+		path = wsPath;
+		path = path.substr(0, path.find_last_of(L"/\\") + 1);
+	}
+}
+
 tstring CWinUtils::GetErrorMsg(DWORD errorCode)
 {
 	HLOCAL hlocal = NULL;
@@ -318,6 +331,414 @@ tstring CWinUtils::GetErrorMsg(DWORD errorCode)
 	return errorMsg;
 }
 
+//ะกำฺ4G
+int CWinUtils::ReadFileToBuf(const std::wstring &filepath, void *&buf, size_t &size)
+{
+	int ret = -1;
+	DWORD readsize = 0;
+	HANDLE hfile = INVALID_HANDLE_VALUE;
+
+	do
+	{
+		hfile = CreateFile(filepath.c_str(), GENERIC_ALL, FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		if (INVALID_HANDLE_VALUE == hfile)
+		{
+			break;
+		}
+
+		size = GetFileSize(hfile, NULL);
+
+		if (size>30 * 1024 * 1024)
+		{
+			break;
+		}
+
+
+		buf = new BYTE[size];
+
+		if (NULL == buf)
+		{
+			break;
+		}
+
+		if (!ReadFile(hfile, buf, size, &readsize, NULL))
+		{
+			break;
+		}
+		size = readsize;
+
+		ret = 0;
+
+	} while (0);
+
+	if (hfile != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(hfile);
+	}
+	return GetLastError();
+
+}
+
+int CWinUtils::WriteBufToFile(const std::wstring &filepath, const void *buf, size_t size)
+{
+	int ret = -1;
+	DWORD writesize = 0;
+	HANDLE hfile = INVALID_HANDLE_VALUE;
+	do
+	{
+		hfile = CreateFile(filepath.c_str(), GENERIC_ALL, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		if (INVALID_HANDLE_VALUE == hfile)
+		{
+			break;
+		}
+
+		if (!WriteFile(hfile, buf, size, &writesize, NULL))
+		{
+			break;
+		}
+
+		ret = 0;
+
+	} while (0);
+
+	if (hfile != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(hfile);
+	}
+
+	return ret;
+}
+
+int CWinUtils::GetDiskFreeSpaceByPath(const std::wstring& path, ULONGLONG &filesize)
+{
+	std::wstring tmpPath;
+	ULARGE_INTEGER totalAvalie = { 0 };
+	ULARGE_INTEGER totalSize = { 0 };
+	ULARGE_INTEGER totalFree = { 0 };
+
+	if (path.empty())
+	{
+		GetCurrentProcessPath(tmpPath);
+	}
+	else
+	{
+		tmpPath = path;
+	}
+
+	GetDiskFreeSpaceEx(tmpPath.c_str(), &totalAvalie, &totalSize, &totalFree);
+	filesize = totalAvalie.QuadPart;
+	return 0;
+
+}
+
+int CWinUtils::GetDiskUsedSpaceByPath(const std::wstring& path, ULONGLONG &filesize)
+{
+	std::wstring tmpPath;
+	ULARGE_INTEGER totalAvalie = { 0 };
+	ULARGE_INTEGER totalSize = { 0 };
+	ULARGE_INTEGER totalFree = { 0 };
+	if (path.empty())
+	{
+		GetCurrentProcessPath(tmpPath);
+	}
+	else
+	{
+		tmpPath = path;
+	}
+
+	GetDiskFreeSpaceEx(tmpPath.c_str(), &totalAvalie, &totalSize, &totalFree);
+	filesize = totalSize.QuadPart - totalAvalie.QuadPart;
+
+	return 0;
+}
+
+int CWinUtils::GetDirectorysSize(const std::wstring &path, ULONGLONG &size)
+{
+	WIN32_FIND_DATA findfiledata = { 0 };
+	HANDLE hFind;
+	std::wstring findfilepath = path;
+
+	int pos = findfilepath.find_last_of(L"\\");
+	if (pos == std::wstring::npos || pos != findfilepath.length() - 1)
+	{
+		findfilepath += L"\\";
+	}
+
+	hFind = FindFirstFile((findfilepath + L"*").c_str(), &findfiledata);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		return -1;
+	}
+
+	do
+	{
+		if (wcscmp(findfiledata.cFileName, L".") == 0 || wcscmp(findfiledata.cFileName, L"..") == 0)
+		{
+			continue;
+		}
+
+		if (findfiledata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+
+			GetDirectorysSize(findfilepath + findfiledata.cFileName, size);
+			continue;
+		}
+		ULONGLONG filesize = (((ULONGLONG)findfiledata.nFileSizeHigh) << 32) + findfiledata.nFileSizeLow;
+		size += filesize;
+		memset(&findfiledata, 0, sizeof(findfiledata));
+
+	} while (FindNextFile(hFind, &findfiledata));
+
+	FindClose(hFind);
+
+	return 0;
+
+}
+
+int CWinUtils::GetLocalFileSize(const std::wstring &path, ULONGLONG &size)
+{
+	WIN32_FIND_DATA findfiledata = { 0 };
+	HANDLE hFind;
+
+	hFind = FindFirstFile(path.c_str(), &findfiledata);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		return -1;
+	}
+
+	size = (((ULONGLONG)findfiledata.nFileSizeHigh) << 32) + findfiledata.nFileSizeLow;
+
+	FindClose(hFind);
+	return 0;
+}
+
+int CWinUtils::FormatFileSize(ULONGLONG &size, ULONGLONG &tailSize, std::wstring &unit)
+{
+	int unitType = 0;//0:B  1:KB  2:MB  3:GB  4:TB
+	ULONGLONG tmpSize = 0;
+
+	if (size >= 1024)
+	{
+		// 0:B
+		tmpSize = size / 1024;
+		unitType = 1;
+		tailSize = (size - tmpSize * 1024);
+		size = tmpSize;
+		if (size >= 1024)
+		{
+			// 1:KB
+			tmpSize = size / 1024;
+			unitType = 2;
+			tailSize = (size - tmpSize * 1024);
+			size = tmpSize;
+			if (size >= 1024)
+			{
+				// 3:GB
+				tmpSize = size / 1024;
+				unitType = 3;
+				tailSize = (size - tmpSize * 1024);
+				size = tmpSize;
+				if (size >= 1024)
+				{
+					// 4:TB
+					tmpSize = size / 1024;
+					unitType = 4;
+					tailSize = (size - tmpSize * 1024);
+					size = tmpSize;
+				}
+			}
+		}
+	}
+
+	tailSize = tailSize * 1000 / 1024 / 10;
+
+	switch (unitType)
+	{
+	case 0:
+		unit = L"B";
+		break;
+	case 1:
+		unit = L"KB";
+		break;
+	case 2:
+		unit = L"MB";
+		break;
+	case 3:
+		unit = L"GB";
+		break;
+	case 4:
+		unit = L"TB";
+		break;
+	default:
+		unit = L"B";
+		break;
+	}
+
+	return 0;
+}
+
+bool	CWinUtils::AdjustProcessPrivileges(const std::wstring &privilegesname)
+{
+	HANDLE   hToken = NULL;
+	TOKEN_PRIVILEGES   tkp;
+	bool ret = false;
+
+	do
+	{
+		if (!OpenProcessToken(GetCurrentProcess(),
+			TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
+		{
+			break;
+		}
+
+		if (!LookupPrivilegeValueW(NULL, privilegesname.c_str(),
+			&tkp.Privileges[0].Luid))
+		{
+			break;
+		}
+
+		tkp.PrivilegeCount = 1;
+		tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+		if (!AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL))
+		{
+			break;
+		}
+
+		ret = true;
+	} while (0);
+
+	if (hToken)
+	{
+		CloseHandle(hToken);
+	}
+
+	return ret;
+}
+
+bool	CWinUtils::CreateDirectorys(const std::wstring &path)
+{
+	std::wstring createDirString;
+	std::vector<std::wstring> subDirs;
+
+	if (FileExists(path.c_str()))
+	{
+		return false;
+	}
+	createDirString = path;
+	CStringUtils::ReplaceAllString(createDirString, L"/", L"\\");
+	CStringUtils::SplitString(createDirString, L"\\", subDirs);
+	createDirString = subDirs[0];
+	for (std::vector<std::wstring> ::iterator it = subDirs.begin() + 1; it != subDirs.end(); it++)
+	{
+		createDirString.append(1, L'\\').append(it->c_str());
+		if (PathFileExists(createDirString.c_str()) && PathIsDirectory(createDirString.c_str()))
+		{
+			continue;
+		}
+
+		if (!CreateDirectory(createDirString.c_str(), NULL))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool	CWinUtils::RemoveDirectorys(const std::wstring &dir)
+{
+	WIN32_FIND_DATA findfiledata = { 0 };
+	HANDLE hFind;
+	std::wstring findfilepath = dir;
+
+	int pos = findfilepath.find_last_of(L"\\");
+	if (pos == std::wstring::npos || pos != findfilepath.length() - 1)
+	{
+		findfilepath += L"\\";
+	}
+
+	hFind = FindFirstFile((findfilepath + L"*").c_str(), &findfiledata);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		return false;
+	}
+
+	do
+	{
+		if (wcscmp(findfiledata.cFileName, L".") == 0 || wcscmp(findfiledata.cFileName, L"..") == 0)
+		{
+			continue;
+		}
+
+		if (findfiledata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+
+			RemoveDirectorys(findfilepath + findfiledata.cFileName);
+			continue;
+		}
+
+		DeleteFile((findfilepath + findfiledata.cFileName).c_str());
+		memset(&findfiledata, 0, sizeof(findfiledata));
+
+	} while (FindNextFile(hFind, &findfiledata));
+
+	FindClose(hFind);
+	return (bool)RemoveDirectory(dir.c_str());
+}
+
+int CWinUtils::EnumDirectoryFile(const std::wstring &dir, bool enumSubDir, std::list<std::wstring> &fileList)
+{
+	WIN32_FIND_DATA findfiledata = { 0 };
+	HANDLE hFind;
+	std::wstring findfilepath = dir;
+
+	int pos = findfilepath.find_last_of(L"\\");
+	if (pos == std::wstring::npos || pos != findfilepath.length() - 1)
+	{
+		findfilepath += L"\\";
+	}
+
+	hFind = FindFirstFile((findfilepath + L"*").c_str(), &findfiledata);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		return -1;
+	}
+
+	do
+	{
+		if (wcscmp(findfiledata.cFileName, L".") == 0 || wcscmp(findfiledata.cFileName, L"..") == 0)
+		{
+			continue;
+		}
+
+		if (findfiledata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			if (enumSubDir)
+			{
+				EnumDirectoryFile(findfilepath + findfiledata.cFileName, enumSubDir, fileList);
+			}
+			continue;
+		}
+
+		fileList.push_back(findfilepath + findfiledata.cFileName);
+
+		memset(&findfiledata, 0, sizeof(findfiledata));
+
+	} while (FindNextFile(hFind, &findfiledata));
+
+	FindClose(hFind);
+
+	return 0;
+}
+
+bool CWinUtils::FileExists(const std::wstring &filepath)
+{
+
+	return (bool)PathFileExists(filepath.c_str());
+}
 
 
 

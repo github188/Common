@@ -97,6 +97,8 @@ void TestWinUtils()
 	std::wstring errorMsg = CWinUtils::GetErrorMsg(GetLastError());
 	std::wstring errorMsg2 = CWinUtils::WIN32_ERROR_STRING;
 
+	bRet =CWinUtils::CreateDirectorys(_T("C:\\2\\3"));
+
 	//StringUtils
 	std::string newS = CStringUtils::ToUpper("helWor");
 

@@ -4,7 +4,6 @@
 
 int CBase64Utils::getCipherLen(int len)
 {
-
 	int outlen = len + len / 3 + (int)(len % 3 != 0);
 
 	if (outlen % 4)
