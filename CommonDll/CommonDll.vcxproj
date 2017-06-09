@@ -166,6 +166,7 @@
     <ClInclude Include="..\inc\Reg\RegOperation.h" />
     <ClInclude Include="..\inc\Utils\Base64Utils.h" />
     <ClInclude Include="..\inc\Utils\MD5Utils.h" />
+    <ClInclude Include="..\inc\Utils\MutexUtils.h" />
     <ClInclude Include="..\inc\Utils\StringUtils.h" />
     <ClInclude Include="..\inc\Utils\WinUtils.h" />
     <ClInclude Include="stdafx.h" />
@@ -183,6 +184,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\Utils\MD5Utils.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\Utils\MutexUtils.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\Utils\StringUtils.cpp">

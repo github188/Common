@@ -7,6 +7,7 @@
 #include "Utils\StringUtils.h"
 #include "Utils\Base64Utils.h"
 #include "Utils\MD5Utils.h"
+#include "Utils\MutexUtils.h"
 
 #define MODULE_NAME		L"TestFunction"
 
@@ -22,12 +23,12 @@ void TestLog()
 	L_TRACE(_T("test trace\n"));
 	L_TRACE_LEAVE();
 	
-	//基于二次封装的 CommonDll
-	CLogEx::LogInitW(_T("CommonTest_logconf.ini"));
-	LOG_INFO(_T("CommonDll Log info\n"));
-	LOG_ERROR(_T("CommonDll Log error\n"));
-	LOG_DEBUG(_T("CommonDll Log debug\n"));
-	CLogEx::LogDone();
+	////基于二次封装的 CommonDll
+	//CLogEx::LogInitW(_T("CommonTest_logconf.ini"));
+	//LOG_INFO(_T("CommonDll Log info\n"));
+	//LOG_ERROR(_T("CommonDll Log error\n"));
+	//LOG_DEBUG(_T("CommonDll Log debug\n"));
+	//CLogEx::LogDone();
 }
 
 //注册表操作
@@ -122,5 +123,16 @@ void TestWinUtils()
 	bool bReturn = CMD5Utils::GetFileMD5(_T("C:\\1.txt"), wstrMd5);
 	CMD5Utils::GetStringMD5(wstrInput, wstrMd5);
 
-
+	//MutexUtils
+	HANDLE hMutex = CMutexUtils::CreateGlobalMutex(TRUE, L"MutexTest");
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		std::wstring msg = CWinUtils::GetErrorMsg(ERROR_ALREADY_EXISTS);
+		L_ERROR(_T("CreateGlobalMutex error : %s\n"), msg.c_str());
+		return;
+	}
+	if (NULL != hMutex)
+	{
+		bRet = CMutexUtils::ReleaseMutex(hMutex);
+	}
 }
