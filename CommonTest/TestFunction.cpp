@@ -6,6 +6,7 @@
 #include "Utils\WinUtils.h"
 #include "Utils\StringUtils.h"
 #include "Utils\Base64Utils.h"
+#include "Utils\MD5Utils.h"
 
 #define MODULE_NAME		L"TestFunction"
 
@@ -112,4 +113,12 @@ void TestWinUtils()
 	{
 		delete []outdata;
 	}
+
+	//MD5Utils
+	std::wstring wstrInput = L"helloworod";
+	std::wstring wstrMd5;
+	bool bReturn = CMD5Utils::GetFileMD5(_T("C:\\1.txt"), wstrMd5);
+	CMD5Utils::GetStringMD5(wstrInput, wstrMd5);
+
+
 }
