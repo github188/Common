@@ -1,9 +1,5 @@
 /**-----------------------------------------------------------------------------
- * @file     CTLogKx.h
- *
- * @author   yangrz@centerm.com.cn
- *
- * @date     2011/3/31
+ * @file     LogBaseKx.h
  *
  * @brief    使用方法：定义以下两个宏
  *           #define MODULE_NAME xxxx
@@ -15,8 +11,8 @@
  * @version  
  *
  *----------------------------------------------------------------------------*/
-#ifndef __CTLOG_KX_H__
-#define __CTLOG_KX_H__
+#ifndef __LOGBASE_KX_H__
+#define __LOGBASE_KX_H__
 
 /**
  * @brief 调试等级
@@ -138,7 +134,7 @@ enum log_level_t
 # define L_TRACE_ENTER() L_TRACE("Enter\n")
 # define L_TRACE_LEAVE() L_TRACE("Leave\n")
 # if DUMP_DATA
-#  define L_DUMP(buf, len) CTLogEx_dump(buf, len)
+#  define L_DUMP(buf, len) LogBase_dump(buf, len)
 # else
 #  define L_DUMP(buf, len)
 # endif
@@ -166,7 +162,7 @@ enum log_level_t
                  __LINE__,                                                              \
                  __VA_ARGS__);                                                          \
     }
-#define L_TMPDUMP(buf, len) CTLogEx_dump(buf, len)
+#define L_TMPDUMP(buf, len) LogBase_dump(buf, len)
 
 #define NB_BYTE 16
 #define L_DUMPMSG(fmt, ...)                                                             \
@@ -178,7 +174,7 @@ enum log_level_t
                  MODULE_NAME,                                                           \
                  __VA_ARGS__);                                                          \
     }                                                                                   
-#define CTLogEx_dump(buf1, len1) \
+#define LogBase_dump(buf1, len1) \
 { \
     char str[NB_BYTE*5 + 1]; \
     int  i,j; \

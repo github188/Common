@@ -1,9 +1,7 @@
-
-#include "StdAfx.h"
+#include "Reg\RegOperation.h"
 #include <string>
 #include <WtsApi32.h>
 #include <UserEnv.h>
-#include "Reg\RegOperation.h"
 
 BOOL CRegOperation::RegReadDword(HKEY Key, const CHAR *Subkeyname, const CHAR *ValueName, 
     DWORD *Value, DWORD DefaultVal)

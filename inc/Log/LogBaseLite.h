@@ -1,11 +1,7 @@
 /**-----------------------------------------------------------------------------
- * @file     CTLogExLite.h
+ * @file     LogBaseLite.h
  *
- * @author   yangrz@centerm.com.cn
- *
- * @date     2011/8/30
- *
- * @brief    CTLogEx的简化版本，
+ * @brief    LogBase的简化版本，
  *           有以下限制：
  *           1. inline函数实现，会增加二进制的大小。
  *           2. 不支持从ini文件动态读取配置；
@@ -16,63 +12,63 @@
  *           有以下优点:
  *           1. 不需要初始化, 包含头文件即可使用，不必连接额外的库, 适合临时调试以及小模块。
  *           2. 可以通过
- *              #define CTLOGEX_LEVEL 0 
+ *              #define LOGBASE_LEVEL 0 
  *              关闭log
  *              调试信息不会被编译到二进制中。
  *
  *           使用方法：
  *           // 设置模块名称，默认"default"
- *           #define MODULE_NAME "CTLOGEX"
+ *           #define MODULE_NAME "LOGBASE"
  *           // 设置调试等级, 默认LOG_LEVEL_TRACE
- *           #define CTLOGEX_LEVEL  0 // 禁用log
+ *           #define LOGBASE_LEVEL  0 // 禁用log
  *           // 设置输出方式, windows 默认调试口，Linux 默认标准错误
- *           #define CTLOGEX_OUTPUT  LOG_OUTPUT_STDERR
+ *           #define LOGBASE_OUTPUT  LOG_OUTPUT_STDERR
  *           // 设置DUMP，默认开启
- *           #define CTLOGEX_DUMP    0 
+ *           #define LOGBASE_DUMP    0 
  *           // 使用高精度时钟, 默认关闭
  *           #define USE_HIGH_PERFORMANCE_COUNTER 1
  *
- *           #include "CTLogExLite.h"
+ *           #include "LogBaseLite.h"
  *
  * @version  
  *          v1.00 初始化
  *
  *----------------------------------------------------------------------------*/
-#ifndef __CTLOGEX_H__
-#define __CTLOGEX_H__
+#ifndef __LOGBASE_H__
+#define __LOGBASE_H__
 
-#ifndef CTLOGEX_LEVEL 
-# define CTLOGEX_LEVEL LOG_LEVEL_TRACE
+#ifndef LOGBASE_LEVEL 
+# define LOGBASE_LEVEL LOG_LEVEL_TRACE
 #endif
 
 #ifndef MODULE_NAME
 # define MODULE_NAME _T("default")
 #endif
 
-#ifndef CTLOGEX_OUTPUT 
+#ifndef LOGBASE_OUTPUT 
 # ifdef _WIN32
-#  define CTLOGEX_OUTPUT LOG_OUTPUT_DBGPORT
+#  define LOGBASE_OUTPUT LOG_OUTPUT_DBGPORT
 # else
-#  define CTLOGEX_OUTPUT LOG_OUTPUT_STDERR
+#  define LOGBASE_OUTPUT LOG_OUTPUT_STDERR
 # endif
 #endif
 
-#ifndef CTLOGEX_DUMP
-# define CTLOGEX_DUMP 1
+#ifndef LOGBASE_DUMP
+# define LOGBASE_DUMP 1
 #endif
 
 #ifdef _WIN32 /* windows */
 #include <windows.h>
 #include <tchar.h>
 
-# define CTLOGAPI __cdecl
+# define LOGBASEAPI __cdecl
 
 # ifndef __cplusplus
 #  define inline 
 # endif
 
 #else        /* Linux */
-# define CTLOGAPI
+# define LOGBASEAPI
 
 # ifndef _T
 #  define _T(x) x
@@ -283,7 +279,7 @@ Log_OsGetTime(MYSYSTEMTIME *time)
 #endif
 
 static inline void
-CTLogEx_puts(TCHAR *out_str, enum log_output_type_t out_type)
+LogBase_puts(TCHAR *out_str, enum log_output_type_t out_type)
 {
 #ifdef _WIN32
     if ( out_type == LOG_OUTPUT_DBGPORT )
@@ -297,8 +293,8 @@ CTLogEx_puts(TCHAR *out_str, enum log_output_type_t out_type)
     }
 }
 
-static inline void CTLOGAPI 
-CTLogEx_printf(const TCHAR *module_name, 
+static inline void LOGBASEAPI 
+LogBase_printf(const TCHAR *module_name,
                int loglevel, 
                const char *function_name,
                const char *file_name,
@@ -471,12 +467,12 @@ CTLogEx_printf(const TCHAR *module_name,
     /*
      * 写入log信息
      */
-    CTLogEx_puts(out, CTLOGEX_OUTPUT);
+	LogBase_puts(out, LOGBASE_OUTPUT);
 }
 
 #define NB_BYTE 16
 static inline void 
-CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const char *file_name, int line, 
+LOGBASEAPI LogBase_dump(const TCHAR *module_name, const char *function_name, const char *file_name, int line,
                       const void *buf1, int len)
 {
     unsigned char  *buf = (unsigned char *)buf1;
@@ -485,7 +481,7 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
     char            c;
     TCHAR           msg[256];
 
-    CTLogEx_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line, 
+	LogBase_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line,
                    _T("---------- Begin Dump %d bytes -------------\n"), len);
     for ( i = 0; i < len; i += NB_BYTE )
     {
@@ -521,9 +517,9 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
         *p = 0;
 
         _sntprintf(msg, sizeof(msg)/sizeof(msg[0]), _T("\t%04x:") CHARSTRING_FMT _T("\n"), i, str);
-        CTLogEx_puts(msg, CTLOGEX_OUTPUT);
+		LogBase_puts(msg, LOGBASE_OUTPUT);
     }
-    CTLogEx_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line, 
+	LogBase_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line,
                    _T("-------------- End Dump --------------\n"));
 }
 
@@ -532,8 +528,8 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  *
  * @param[in] fmt 格式化字符串
  */
-#if (CTLOGEX_LEVEL >= LOG_LEVEL_TRACE)
-#define L_TRACE(...) CTLogEx_printf(MODULE_NAME, LOG_LEVEL_TRACE, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
+#if (LOGBASE_LEVEL >= LOG_LEVEL_TRACE)
+#define L_TRACE(...) LogBase_printf(MODULE_NAME, LOG_LEVEL_TRACE, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 #else
 #define L_TRACE(...)
 #endif
@@ -545,8 +541,8 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  *
  * @param[in] fmt 格式化字符串
  */
-#if (CTLOGEX_LEVEL >= LOG_LEVEL_DEBUG)
-#define L_DEBUG(...) CTLogEx_printf(MODULE_NAME, LOG_LEVEL_DEBUG, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
+#if (LOGBASE_LEVEL >= LOG_LEVEL_DEBUG)
+#define L_DEBUG(...) LogBase_printf(MODULE_NAME, LOG_LEVEL_DEBUG, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 #else
 #define L_DEBUG(...)
 #endif
@@ -556,8 +552,8 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  *
  * @param[in] fmt 格式化字符串
  */
-#if (CTLOGEX_LEVEL >= LOG_LEVEL_INFO)
-#define L_INFO(...)  CTLogEx_printf(MODULE_NAME, LOG_LEVEL_INFO,  __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
+#if (LOGBASE_LEVEL >= LOG_LEVEL_INFO)
+#define L_INFO(...)  LogBase_printf(MODULE_NAME, LOG_LEVEL_INFO,  __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 #else
 #define L_INFO(...)
 #endif
@@ -567,8 +563,8 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  *
  * @param[in] fmt 格式化字符串
  */
-#if (CTLOGEX_LEVEL >= LOG_LEVEL_WARN)
-#define L_WARN(...)  CTLogEx_printf(MODULE_NAME, LOG_LEVEL_WARN,  __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
+#if (LOGBASE_LEVEL >= LOG_LEVEL_WARN)
+#define L_WARN(...)  LogBase_printf(MODULE_NAME, LOG_LEVEL_WARN,  __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 #else
 #define L_WARN(...)
 #endif
@@ -577,8 +573,8 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  *
  * @param[in] fmt 格式化字符串
  */
-#if (CTLOGEX_LEVEL >= LOG_LEVEL_ERROR)
-#define L_ERROR(...) CTLogEx_printf(MODULE_NAME, LOG_LEVEL_ERROR, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
+#if (LOGBASE_LEVEL >= LOG_LEVEL_ERROR)
+#define L_ERROR(...) LogBase_printf(MODULE_NAME, LOG_LEVEL_ERROR, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 #else
 #define L_ERROR(...)
 #endif
@@ -588,8 +584,8 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  *
  * @param[in] fmt 格式化字符串
  */
-#if (CTLOGEX_LEVEL >= LOG_LEVEL_FATAL)
-#define L_FATAL(...) CTLogEx_printf(MODULE_NAME, LOG_LEVEL_FATAL, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
+#if (LOGBASE_LEVEL >= LOG_LEVEL_FATAL)
+#define L_FATAL(...) LogBase_printf(MODULE_NAME, LOG_LEVEL_FATAL, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 #else
 #define L_FATAL(...)
 #endif
@@ -600,7 +596,7 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  *
  * @param[in] fmt 格式化字符串
  */
-#define L_TEMP(...) CTLogEx_printf(MODULE_NAME, LOG_TYPE_TMP, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
+#define L_TEMP(...) LogBase_printf(MODULE_NAME, LOG_TYPE_TMP, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);
 
 /**
  * @brief dump数据块
@@ -608,8 +604,8 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  * @param[in] buf         数据地址
  * @param[in] len         数据块大小
  */
-#if CTLOGEX_DUMP
-#define L_DUMP(buf, len) CTLogEx_dump(MODULE_NAME, __FUNCTION__, __FILE__, __LINE__, buf, len);
+#if LOGBASE_DUMP
+#define L_DUMP(buf, len) LogBase_dump(MODULE_NAME, __FUNCTION__, __FILE__, __LINE__, buf, len);
 #else
 #define L_DUMP(buf, len)
 #endif
@@ -620,7 +616,7 @@ CTLOGAPI CTLogEx_dump(const TCHAR *module_name, const char *function_name, const
  * @param[in] buf         数据地址
  * @param[in] len         数据块大小
  */
-#define L_TMPDUMP(buf, len) CTLogEx_dump(MODULE_NAME, __FUNCTION__, __FILE__, __LINE__, buf, len);
+#define L_TMPDUMP(buf, len) LogBase_dump(MODULE_NAME, __FUNCTION__, __FILE__, __LINE__, buf, len);
 
 #ifdef _WIN32
 # pragma warning(pop)

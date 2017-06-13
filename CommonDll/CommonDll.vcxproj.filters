@@ -78,8 +78,17 @@
     <ClInclude Include="..\src\Log\LogBase_OsWin.h">
       <Filter>Source Files\Log</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\CTUtils.h">
+    <ClInclude Include="..\inc\Common\CTUtils.h">
       <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Utils\SocketUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Log\LogBaseKx.h">
+      <Filter>Header Files\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Log\LogBaseLite.h">
+      <Filter>Header Files\Log</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Log\LogBase_OsWin.cpp">
       <Filter>Source Files\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utils\SocketUtils.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
