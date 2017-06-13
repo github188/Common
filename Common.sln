@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonTest", "CommonTest\Co
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CTLogEx", "CTLogEx\CTLogEx.vcxproj", "{FC01AEC6-35F7-4BCC-B2E7-50FF2E33488F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SocketHelp", "src\SocketHelp\SocketHelp.vcxproj", "{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -43,14 +41,6 @@ Global
 		{FC01AEC6-35F7-4BCC-B2E7-50FF2E33488F}.Release|x64.Build.0 = Release|x64
 		{FC01AEC6-35F7-4BCC-B2E7-50FF2E33488F}.Release|x86.ActiveCfg = Release|Win32
 		{FC01AEC6-35F7-4BCC-B2E7-50FF2E33488F}.Release|x86.Build.0 = Release|Win32
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Debug|x64.ActiveCfg = Debug|x64
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Debug|x64.Build.0 = Debug|x64
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Debug|x86.ActiveCfg = Debug|Win32
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Debug|x86.Build.0 = Debug|Win32
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Release|x64.ActiveCfg = Release|x64
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Release|x64.Build.0 = Release|x64
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Release|x86.ActiveCfg = Release|Win32
-		{72A05D34-7C45-44D6-B9E9-0E8019E43FDB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
