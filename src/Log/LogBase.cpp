@@ -1,23 +1,11 @@
-/**-----------------------------------------------------------------------------
- * @file     CTLogEx.cpp
- *
- * @author   yangrz@centerm.com.cn
- *
- * @date     2011/2/1
- *
- * @brief    
- *
- * @version  
- *
- *----------------------------------------------------------------------------*/
 #include <string>
 #include <map>
 #ifdef _WIN32
-#include "CTLogEx_OsWin.h"
+#include "LogBase_OsWin.h"
 #else
-#include "CTLogEx_OsUnix.h"
+#include "LogBase_OsUnix.h"
 #endif
-#include "CTLogEx.h"
+#include "LogBase.h"
 
 // 默认配置文件
 #ifdef _WIN32
@@ -524,7 +512,7 @@ EXIT:
  * 写入log信息
  */
 static void
-CTLogEx_puts(TCHAR *out_str)
+LogBase_puts(TCHAR *out_str)
 {
     Log_OsLock();
     if ( g_running == FALSE )
@@ -583,9 +571,9 @@ EXIT:
 }
 
 #ifdef _UNICODE
-void CTLOGAPI CTLogEx_printfW
+void DLL_COMMONLIB_API LogBase_printfW
 #else
-void CTLOGAPI CTLogEx_printfA 
+void DLL_COMMONLIB_API LogBase_printfA 
 #endif
                 (const TCHAR *module_name, 
                 log_level_t loglevel, 
@@ -767,7 +755,7 @@ void CTLOGAPI CTLogEx_printfA
     /*
      * 写入log信息
      */
-    CTLogEx_puts(out);
+    LogBase_puts(out);
     if ( out != buf )
     {
         free(out);
@@ -775,8 +763,8 @@ void CTLOGAPI CTLogEx_printfA
 }
 
 #ifdef _UNICODE
-void CTLOGAPI 
-CTLogEx_printfA(const char *module_name, 
+void DLL_COMMONLIB_API 
+LogBase_printfA(const char *module_name, 
                 log_level_t loglevel, 
                 const char *function_name,
                 const char *file_name,
@@ -820,7 +808,7 @@ CTLogEx_printfA(const char *module_name,
     }
     if ( vsnprintf(out, len, pszFormat, args) > 0 )
     {
-        CTLogEx_printfW(module_name_w, loglevel, function_name, file_name, line, L"%S", out);
+        LogBase_printfW(module_name_w, loglevel, function_name, file_name, line, L"%S", out);
     }
     va_end(args);
 
@@ -832,9 +820,9 @@ CTLogEx_printfA(const char *module_name,
 #endif
 
 #ifdef _UNICODE
-void CTLOGAPI CTLogEx_dumpW
+void DLL_COMMONLIB_API LogBase_dumpW
 #else
-void CTLOGAPI CTLogEx_dumpA
+void DLL_COMMONLIB_API LogBase_dumpA
 #endif
               (const TCHAR *module_name, int b_force, const char *function_name, 
                const char *file_name, int line, const void *buf1, int len)
@@ -876,7 +864,7 @@ void CTLOGAPI CTLogEx_dumpA
         return;
     }
 
-    CTLogEx_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line, 
+    LogBase_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line, 
                    _T("---------- Begin Dump %d bytes -------------\n"), len);
     for ( i = 0; i < len; i += NB_BYTE )
     {
@@ -912,15 +900,15 @@ void CTLOGAPI CTLogEx_dumpA
         *p = 0;
 
         _sntprintf(msg, sizeof(msg)/sizeof(msg[0]), _T("\t%04x:") CHARSTRING_FMT _T("\n"), i, str);
-        CTLogEx_puts(msg);
+        LogBase_puts(msg);
     }
-    CTLogEx_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line, 
+    LogBase_printf(module_name, LOG_TYPE_DUMP, function_name, file_name, line, 
                    _T("-------------- End Dump --------------\n"));
 }
 
 #ifdef _UNICODE
-void CTLOGAPI 
-CTLogEx_dumpA(const char *module_name, int b_force, const char *function_name, 
+void DLL_COMMONLIB_API 
+LogBase_dumpA(const char *module_name, int b_force, const char *function_name, 
               const char *file_name, int line, const void *buf, int len)
 {
     wchar_t module_name_w[MAX_CONF_BUF_SIZE];
@@ -932,14 +920,14 @@ CTLogEx_dumpA(const char *module_name, int b_force, const char *function_name,
     }
     
     swprintf(module_name_w, MAX_CONF_BUF_SIZE, L"%S", module_name);
-    CTLogEx_dumpW(module_name_w, b_force, function_name, file_name, line, buf, len);
+    LogBase_dumpW(module_name_w, b_force, function_name, file_name, line, buf, len);
 }
 #endif
 
 #ifdef _UNICODE
-void CTLOGAPI CTLogEx_SetOptStrW
+void DLL_COMMONLIB_API LogBase_SetOptStrW
 #else
-void CTLOGAPI CTLogEx_SetOptStrA
+void DLL_COMMONLIB_API LogBase_SetOptStrA
 #endif
                    (const TCHAR *modulename, 
                     const TCHAR *filedname, 
@@ -1055,8 +1043,8 @@ EXIT:
 }
 
 #ifdef UNICODE
-void CTLOGAPI 
-CTLogEx_SetOptStrA(const char *modulename, 
+void DLL_COMMONLIB_API 
+LogBase_SetOptStrA(const char *modulename, 
                    const char *filedname, 
                    const char *value)
 {
@@ -1070,15 +1058,15 @@ CTLogEx_SetOptStrA(const char *modulename,
         swprintf(filedname_w, MAX_CONF_BUF_SIZE, L"%S", filedname);
         swprintf(value_w, MAX_CONF_BUF_SIZE, L"%S", value);
 
-        CTLogEx_SetOptStrW(modulename_w, filedname_w, value_w);
+        LogBase_SetOptStrW(modulename_w, filedname_w, value_w);
     }
 }
 #endif
 
 #ifdef _UNICODE
-void CTLOGAPI CTLogEx_SetOptIntW
+void DLL_COMMONLIB_API LogBase_SetOptIntW
 #else
-void CTLOGAPI CTLogEx_SetOptIntA
+void DLL_COMMONLIB_API LogBase_SetOptIntA
 #endif
                   (const TCHAR *modulename, 
                    const TCHAR *filedname, 
@@ -1087,12 +1075,12 @@ void CTLOGAPI CTLogEx_SetOptIntA
     TCHAR buf[64];
 
     _sntprintf(buf, sizeof(buf)/sizeof(TCHAR), _T("%d"), value);
-    CTLogEx_SetOptStr(modulename, filedname, buf);
+    LogBase_SetOptStr(modulename, filedname, buf);
 }
 
 #ifdef _UNICODE
-void CTLOGAPI 
-CTLogEx_SetOptIntA(const char *modulename, 
+void DLL_COMMONLIB_API 
+LogBase_SetOptIntA(const char *modulename, 
                    const char *filedname, 
                    int value)
 {
@@ -1104,15 +1092,15 @@ CTLogEx_SetOptIntA(const char *modulename,
         swprintf(modulename_w, MAX_CONF_BUF_SIZE, L"%S", modulename);
         swprintf(filedname_w, MAX_CONF_BUF_SIZE, L"%S", filedname);
 
-        CTLogEx_SetOptIntW(modulename_w, filedname_w, value);
+        LogBase_SetOptIntW(modulename_w, filedname_w, value);
     }
 }
 #endif
 
 #ifdef _UNICODE
-int CTLOGAPI CTLogEx_initExW
+int DLL_COMMONLIB_API LogBase_initExW
 #else
-int CTLOGAPI CTLogEx_initExA
+int DLL_COMMONLIB_API LogBase_initExA
 #endif
         (const TCHAR *config_file, int flags)
 {
@@ -1135,7 +1123,7 @@ int CTLOGAPI CTLogEx_initExA
              
         if ( !bSame )
         {
-            Log_OsShowError(_T("error: recall CTLogEx_init, use org config_file %s\n"),
+            Log_OsShowError(_T("error: recall LogBase_init, use org config_file %s\n"),
                             g_config_file ? g_config_file : _T("NULL"));
         }
         return FALSE;
@@ -1173,8 +1161,8 @@ int CTLOGAPI CTLogEx_initExA
 }
 
 #ifdef _UNICODE
-BOOL CTLOGAPI 
-CTLogEx_initExA(const char *config_file, int flags)
+BOOL DLL_COMMONLIB_API 
+LogBase_initExA(const char *config_file, int flags)
 {
     if ( config_file )
     {
@@ -1182,41 +1170,41 @@ CTLogEx_initExA(const char *config_file, int flags)
 
         swprintf(config_file_w, sizeof(config_file_w)/sizeof(config_file_w[0]), 
                  L"%S", config_file);
-        return CTLogEx_initExW(config_file_w, flags);
+        return LogBase_initExW(config_file_w, flags);
     }
     else
     {
-        return CTLogEx_initExW(NULL, flags);
+        return LogBase_initExW(NULL, flags);
     }
 }
 #endif
 
 #ifdef _UNICODE
-int CTLOGAPI CTLogEx_initW
+int DLL_COMMONLIB_API LogBase_initW
 #else
-int CTLOGAPI CTLogEx_initA
+int DLL_COMMONLIB_API LogBase_initA
 #endif
         (const TCHAR *config_file)
 {
-    return CTLogEx_initEx(config_file, 0);
+    return LogBase_initEx(config_file, 0);
 }
 
 #ifdef _UNICODE
-BOOL CTLOGAPI 
-CTLogEx_initA(const char *config_file)
+BOOL DLL_COMMONLIB_API 
+LogBase_initA(const char *config_file)
 {
-    return CTLogEx_initExA(config_file, 0);
+    return LogBase_initExA(config_file, 0);
 }
 #endif
 
-void CTLOGAPI
-CTLogEx_reload()
+void DLL_COMMONLIB_API
+LogBase_reload()
 {
     LoadLogConf(g_config_file);
 }
 
-void CTLOGAPI 
-CTLogEx_done(void)
+void DLL_COMMONLIB_API 
+LogBase_done(void)
 {
     if ( g_running != FALSE )
     {

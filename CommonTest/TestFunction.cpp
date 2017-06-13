@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "Reg\RegOperation.h"
 #include "CTLogEx\CTLogEx.h"
-#include "Log\LogExBase.h"
 #include "Utils\WinUtils.h"
 #include "Utils\StringUtils.h"
 #include "Utils\Base64Utils.h"

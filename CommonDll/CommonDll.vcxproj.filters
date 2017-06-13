@@ -51,14 +51,8 @@
     <ClInclude Include="..\inc\DllExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\Log\LogExBase.h">
-      <Filter>Header Files\Log</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\Utils\WinUtils.h">
       <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\CTUtils.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\Utils\StringUtils.h">
       <Filter>Header Files\Utils</Filter>
@@ -78,19 +72,22 @@
     <ClInclude Include="..\inc\Utils\EventUtils.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Log\LogBase.h">
+      <Filter>Header Files\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Log\LogBase_OsWin.h">
+      <Filter>Source Files\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\CTUtils.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Reg\RegOperation.cpp">
       <Filter>Source Files\Reg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Log\LogExBase.cpp">
-      <Filter>Source Files\Log</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utils\WinUtils.cpp">
       <Filter>Source Files\Utils</Filter>
@@ -112,6 +109,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Utils\EventUtils.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Log\LogBase.cpp">
+      <Filter>Source Files\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Log\LogBase_OsWin.cpp">
+      <Filter>Source Files\Log</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
