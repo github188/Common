@@ -3,8 +3,6 @@
 #ifndef __REG_OPERATION_H__
 #define __REG_OPERATION_H__
 
-#include <Windows.h>
-#include <tchar.h>
 #include "DllExport.h"
 
 /** 

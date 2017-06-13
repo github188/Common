@@ -1,11 +1,10 @@
-#include "stdafx.h"
+#include "Utils\WinUtils.h"
+#include "Utils\StringUtils.h"
 #include <vector>
 #include <string>
 #include <Iphlpapi.h>
 #include <WtsApi32.h>
 #include "CTUtils.h"
-#include "Utils\WinUtils.h"
-#include "Utils\StringUtils.h"
 #include "Shlwapi.h"
 #pragma comment (lib,"Shlwapi.lib")
 
