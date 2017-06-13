@@ -84,6 +84,12 @@
     <ClInclude Include="..\inc\Utils\SocketUtils.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Log\LogBaseKx.h">
+      <Filter>Header Files\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Log\LogBaseLite.h">
+      <Filter>Header Files\Log</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

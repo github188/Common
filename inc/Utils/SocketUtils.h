@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __Socket_UTILS_H__
-#define __Socket_UTILS_H__
+#ifndef __SOCKET_UTILS_H__
+#define __SOCKET_UTILS_H__
 
 #include <WinSock2.h>
 #include "DllExport.h"
