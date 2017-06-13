@@ -1,17 +1,5 @@
-/**-----------------------------------------------------------------------------
- * @file     CTLogEx_OsWin.h
- *
- * @author   yangrz@centerm.com.cn
- *
- * @date     2011-02-08
- *
- * @brief    
- *
- * @version  
- *
- *----------------------------------------------------------------------------*/
-#ifndef __CTLOGEX_OS_WIN_H__
-#define __CTLOGEX_OS_WIN_H__
+#ifndef __LOGBASE_OS_WIN_H__
+#define __LOGBASE_OS_WIN_H__
 
 #include <windows.h>
 #include <tchar.h>

@@ -1,17 +1,5 @@
-/**-----------------------------------------------------------------------------
- * @file     CTLogEx_OsDep.cpp
- *
- * @author   yangrz@centerm.com.cn
- *
- * @date     2011/2/8
- *
- * @brief    
- *
- * @version  
- *
- *----------------------------------------------------------------------------*/
-#include "CTLogEx_OsWin.h"
-#include "CTLogEx.h"
+#include "LogBase_OsWin.h"
+#include "LogBase.h"
 #include <process.h>
 
 // 全局锁
@@ -219,7 +207,7 @@ FileChangeMonitorThread(LPVOID param)
         if ( _wcsnicmp(pinfo->FileName, filename.c_str(), pinfo->FileNameLength / 2) == 0 )
         {
             // 重新载入配置
-            CTLogEx_reload();
+            LogBase_reload();
         }
     }
 
