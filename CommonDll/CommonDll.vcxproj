@@ -166,6 +166,7 @@
     <ClInclude Include="..\inc\Log\LogBaseKx.h" />
     <ClInclude Include="..\inc\Log\LogBaseLite.h" />
     <ClInclude Include="..\inc\Reg\RegOperation.h" />
+    <ClInclude Include="..\inc\Service\ServiceUtils.h" />
     <ClInclude Include="..\inc\Utils\Base64Utils.h" />
     <ClInclude Include="..\inc\Utils\EventUtils.h" />
     <ClInclude Include="..\inc\Utils\MD5Utils.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="..\inc\Utils\StringUtils.h" />
     <ClInclude Include="..\inc\Utils\WinUtils.h" />
     <ClInclude Include="..\src\Log\LogBase_OsWin.h" />
+    <ClInclude Include="..\src\Service\Service.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +194,14 @@
     <ClCompile Include="..\src\Reg\RegOperation.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\Service\Service.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\Service\ServiceUtils.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\Utils\Base64Utils.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
