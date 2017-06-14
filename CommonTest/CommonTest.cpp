@@ -4,50 +4,31 @@
 #include "stdafx.h"
 #include "TestFunction.h"
 
-#include "Service\ServiceUtils.h"
-
+//#define _TEST_SERVICE_
 #define _TEST_LOG_
 //#define _TEST_REG_
 #define _TEST_WIN_UTILS_
 
-BOOL WINAPI CommonTestServiceStart()
-{
-	//CGlobalController::GlobalInit();
-	return TRUE;
-}
 
-
-BOOL WINAPI CommonTestServiceStop()
-{
-	//CGlobalController::GlobalDone();
-	return FALSE;
-}
 
 int main()
 {
 
-	ServiceBaseInfo Info;
+#ifdef _TEST_SERVICE_
+	TestService();
+#endif // _TEST_SERVICE_
 
-	Info.ConsoloMode = FALSE;
-	Info.LogConfigPath = _T("CommonTest_logconf.ini");
-	Info.LogModuleName = _T("CommonTestService");
-	Info.ServiceName = _T("CommonTestService");
-	Info.StartFun = CommonTestServiceStart;
-	Info.StopFun = CommonTestServiceStop;
+#ifdef _TEST_LOG_
+	TestLog();
+#endif // _TEST_LOG_
 
-	ServiceMain(&Info);
+#ifdef _TEST_LOG_
+	TestReg();
+#endif // _TEST_REG_
 
-//#ifdef _TEST_LOG_
-//	TestLog();
-//#endif // _TEST_LOG_
-//
-//#ifdef _TEST_LOG_
-//	TestReg();
-//#endif // _TEST_REG_
-//
-//#ifdef _TEST_WIN_UTILS_
-//	TestWinUtils();
-//#endif // _TEST_WIN_UTILS
+#ifdef _TEST_WIN_UTILS_
+	TestWinUtils();
+#endif // _TEST_WIN_UTILS
 
 
 

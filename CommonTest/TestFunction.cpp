@@ -7,6 +7,7 @@
 #include "Utils\Base64Utils.h"
 #include "Utils\MD5Utils.h"
 #include "Utils\MutexUtils.h"
+#include "Service\ServiceUtils.h"
 
 #define MODULE_NAME		L"TestFunction"
 
@@ -127,4 +128,32 @@ void TestWinUtils()
 	{
 		bRet = CMutexUtils::ReleaseMutex(hMutex);
 	}
+}
+
+BOOL WINAPI CommonTestServiceStart()
+{
+	//CGlobalController::GlobalInit();
+	return TRUE;
+}
+
+
+BOOL WINAPI CommonTestServiceStop()
+{
+	//CGlobalController::GlobalDone();
+	return FALSE;
+}
+
+//×¢²á³É·þÎñs
+void TestService()
+{
+	ServiceBaseInfo Info;
+
+	Info.ConsoloMode = FALSE;
+	Info.LogConfigPath = _T("CommonTest_logconf.ini");
+	Info.LogModuleName = _T("CommonTestService");
+	Info.ServiceName = _T("CommonTestService");
+	Info.StartFun = CommonTestServiceStart;
+	Info.StopFun = CommonTestServiceStop;
+
+	ServiceMain(&Info);
 }

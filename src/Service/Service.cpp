@@ -6,7 +6,7 @@
 #include "Log\LogBase.h"
 #include "mindump.h"
 
-#define		MODULE_NAME		L"123"
+#define	MODULE_NAME		L"Service"
 
 static ServiceBaseInfo*      gServiceInfo = NULL;
 static HANDLE                gTerminateEvent = NULL;
@@ -300,8 +300,6 @@ int WINAPI ServiceMainLib(ServiceBaseInfo *ServiceInfo)
 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	//CLogEx::LogInit(ServiceInfo->LogConfigPath);
-	//CLogEx::SetModuleName(ServiceInfo->LogModuleName);
 	LogBase_init(ServiceInfo->LogConfigPath);
 
 	ServiceMainProcess(ServiceInfo);
