@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Common">
       <UniqueIdentifier>{ec006fa9-1ce6-43c2-b4ef-cfc8ca9c267c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Service">
+      <UniqueIdentifier>{901caa8c-8264-42b5-a340-c35034533ef2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Service">
+      <UniqueIdentifier>{c52338a5-2867-47c4-b15c-99b2031be7c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -90,6 +96,12 @@
     <ClInclude Include="..\inc\Log\LogBaseLite.h">
       <Filter>Header Files\Log</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Service\ServiceUtils.h">
+      <Filter>Header Files\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Service\Service.h">
+      <Filter>Source Files\Service</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -127,6 +139,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Utils\SocketUtils.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Service\ServiceUtils.cpp">
+      <Filter>Source Files\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Service\Service.cpp">
+      <Filter>Source Files\Service</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
