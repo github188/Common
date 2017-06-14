@@ -49,6 +49,14 @@ typedef struct
 */
 DLL_COMMONLIB_API int WINAPI ServiceMain(ServiceBaseInfo *ServiceInfo);
 
+/** @brief 启动服务
+*	@param[in]	serviceName	服务名称
+*	@return  返回操作结果
+*	 - false 转换失败
+*	 - true	 转换成功
+*/
+DLL_COMMONLIB_API BOOL WINAPI ServiceStart(const WCHAR* serviceName);
+
 #ifdef __cplusplus
 }
 #endif
