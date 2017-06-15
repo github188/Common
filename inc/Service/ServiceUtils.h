@@ -52,10 +52,18 @@ DLL_COMMONLIB_API int WINAPI ServiceMain(ServiceBaseInfo *ServiceInfo);
 /** @brief 启动服务
 *	@param[in]	serviceName	服务名称
 *	@return  返回操作结果
-*	 - false 转换失败
-*	 - true	 转换成功
+*	 - false 失败
+*	 - true 成功
 */
 DLL_COMMONLIB_API BOOL WINAPI ServiceStart(const WCHAR* serviceName);
+
+/** @brief 停止服务
+*	@param[in]	serviceName	服务名称
+*	@return  返回操作结果
+*	 - false 失败
+*	 - true 成功
+*/
+DLL_COMMONLIB_API BOOL WINAPI ServiceStop(const WCHAR* serviceName);
 
 #ifdef __cplusplus
 }

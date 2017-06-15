@@ -4,10 +4,10 @@
 #include "stdafx.h"
 #include "TestFunction.h"
 
-//#define _TEST_SERVICE_
-#define _TEST_LOG_
+#define _TEST_SERVICE_
+//#define _TEST_LOG_
 //#define _TEST_REG_
-#define _TEST_WIN_UTILS_
+//#define _TEST_WIN_UTILS_
 
 
 
