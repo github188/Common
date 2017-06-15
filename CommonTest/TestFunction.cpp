@@ -8,8 +8,11 @@
 #include "Utils\MD5Utils.h"
 #include "Utils\MutexUtils.h"
 #include "Service\ServiceUtils.h"
+#include <process.h>
 
 #define MODULE_NAME		L"TestFunction"
+
+BOOL g_WatchThreadExit = FALSE;
 
 //日志操作
 void TestLog()
@@ -130,20 +133,79 @@ void TestWinUtils()
 	}
 }
 
+static DWORD WINAPI WatchServiceThread(void *pParam)
+{
+	DWORD dwRet = -1;
+
+	while (true)
+	{
+		if (g_WatchThreadExit)
+		{
+			L_INFO(L"exit watch thread");
+			goto EXIT;
+		}
+
+		BOOL bRet = CRegOperation::RegReadDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", L"TestDword", &dwRet, 99);
+		if (!bRet || dwRet != 56)
+		{
+			L_INFO(L"dword value not equal 56");
+			bRet = CRegOperation::RegWriteDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", L"TestDword", 56);
+			if (!bRet)
+			{
+				L_ERROR(L"set reg fail");
+			}
+			else
+			{
+				L_INFO(L"set reg success");
+			}
+		}
+
+		Sleep(5000);
+	}
+
+EXIT:
+
+	return dwRet;
+}
+
 BOOL WINAPI CommonTestServiceStart()
 {
-	//CGlobalController::GlobalInit();
+	L_TRACE_ENTER();
+
+	g_WatchThreadExit = FALSE;
+	
+	HANDLE hWatchServiceThread = (HANDLE)_beginthreadex(NULL, 0,
+		(unsigned int(__stdcall *)(void *))WatchServiceThread,
+		NULL, 0, NULL);
+	if (hWatchServiceThread == NULL)
+	{
+		L_ERROR(L"_beginthreadex failed %d", GetLastError());
+		return false;
+	}
+	else
+	{
+		CloseHandle(hWatchServiceThread);
+		hWatchServiceThread = NULL;
+	}
+
+	L_TRACE_LEAVE();
+
 	return TRUE;
 }
 
 
 BOOL WINAPI CommonTestServiceStop()
 {
-	//CGlobalController::GlobalDone();
+	L_TRACE_ENTER();
+
+	g_WatchThreadExit = TRUE;
+
+	L_TRACE_LEAVE();
+
 	return FALSE;
 }
 
-//注册成服务s
+//注册成服务
 void TestService()
 {
 	ServiceBaseInfo Info;
