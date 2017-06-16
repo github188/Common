@@ -8,8 +8,12 @@
 #include "Utils\MD5Utils.h"
 #include "Utils\MutexUtils.h"
 #include "Service\ServiceUtils.h"
+#include <process.h>
+#include "Thread\ThreadUtils.h"
 
 #define MODULE_NAME		L"TestFunction"
+
+BOOL g_WatchThreadExit = FALSE;
 
 //日志操作
 void TestLog()
@@ -66,7 +70,13 @@ void TestWinUtils()
 	//WinUtils
 	int numOfNic = 0;
 	std::vector<BYTE> mac;
-	bRet = CWinUtils::GetMacAddr(&numOfNic, mac);
+	WCHAR macAddress[256] = { 0 };
+	std::vector<DWORD> iplist;
+	WCHAR ipAddress[256] = { 0 };
+	bRet = CWinUtils::GetMacList(&numOfNic, mac);
+	bRet = CWinUtils::GetMacAddress(macAddress);
+	CWinUtils::GetIPList(iplist);
+	bRet = CWinUtils::GetIPAddresss(ipAddress);
 
 	char hostName[32] = { 0 };
 	bRet = CWinUtils::GetHostname(hostName);
@@ -77,9 +87,13 @@ void TestWinUtils()
 	bRet = CWinUtils::IsFullpath(_T("C:\\1.txt"));
 
 	std::wstring userName = _T("");
+	HANDLE userToken;
+	HANDLE uacToken;
 	dwRet = CWinUtils::GetSessionID();
 	if (dwRet > 0)
 	{
+		bRet = CWinUtils::AdjustProcessPrivileges(SE_TCB_NAME);
+		bRet = CWinUtils::GetSessionToken(dwRet, &userToken);
 		bRet = CWinUtils::GetSessionUserName(dwRet, userName);
 	}
 
@@ -92,6 +106,12 @@ void TestWinUtils()
 	std::wstring errorMsg2 = CWinUtils::WIN32_ERROR_STRING;
 
 	bRet =CWinUtils::CreateDirectorys(_T("C:\\2\\3"));
+
+	CHAR uuid[256] = { 0 };
+	bRet = CWinUtils::GetSystemUUID(uuid);
+
+	DWORD dwVer = CWinUtils::GetOSVersion();
+	bRet = CWinUtils::Is64BitOS();
 
 	//StringUtils
 	std::string newS = CStringUtils::ToUpper("helWor");
@@ -130,20 +150,79 @@ void TestWinUtils()
 	}
 }
 
+static DWORD WINAPI WatchServiceThread(void *pParam)
+{
+	DWORD dwRet = -1;
+
+	while (true)
+	{
+		if (g_WatchThreadExit)
+		{
+			L_INFO(L"exit watch thread");
+			goto EXIT;
+		}
+
+		BOOL bRet = CRegOperation::RegReadDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", L"TestDword", &dwRet, 99);
+		if (!bRet || dwRet != 56)
+		{
+			L_INFO(L"dword value not equal 56");
+			bRet = CRegOperation::RegWriteDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", L"TestDword", 56);
+			if (!bRet)
+			{
+				L_ERROR(L"set reg fail");
+			}
+			else
+			{
+				L_INFO(L"set reg success");
+			}
+		}
+
+		Sleep(5000);
+	}
+
+EXIT:
+
+	return dwRet;
+}
+
 BOOL WINAPI CommonTestServiceStart()
 {
-	//CGlobalController::GlobalInit();
+	L_TRACE_ENTER();
+
+	g_WatchThreadExit = FALSE;
+	
+	HANDLE hWatchServiceThread = (HANDLE)_beginthreadex(NULL, 0,
+		(unsigned int(__stdcall *)(void *))WatchServiceThread,
+		NULL, 0, NULL);
+	if (hWatchServiceThread == NULL)
+	{
+		L_ERROR(L"_beginthreadex failed %d", GetLastError());
+		return false;
+	}
+	else
+	{
+		CloseHandle(hWatchServiceThread);
+		hWatchServiceThread = NULL;
+	}
+
+	L_TRACE_LEAVE();
+
 	return TRUE;
 }
 
 
 BOOL WINAPI CommonTestServiceStop()
 {
-	//CGlobalController::GlobalDone();
+	L_TRACE_ENTER();
+
+	g_WatchThreadExit = TRUE;
+
+	L_TRACE_LEAVE();
+
 	return FALSE;
 }
 
-//注册成服务s
+//注册成服务
 void TestService()
 {
 	ServiceBaseInfo Info;
@@ -156,4 +235,9 @@ void TestService()
 	Info.StopFun = CommonTestServiceStop;
 
 	ServiceMain(&Info);
+}
+
+void TestThread()
+{
+	
 }
