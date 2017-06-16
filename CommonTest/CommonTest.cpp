@@ -15,8 +15,6 @@
 int main()
 {
 
-
-
 #ifdef _TEST_SERVICE_
 	TestService();
 #endif // _TEST_SERVICE_

@@ -15,19 +15,17 @@ void CThread::Init(ThreadMainProc MainFunc, LPVOID MainParam, ThreadEndProc EndF
 {
     this->mMainThread = NULL;
     this->mMainThreadId = 0;
+	this->mContinueMainThread = FALSE;
 
     this->mStopMainThreadEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
-    this->mMainThreadStopedEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
     this->mMainThreadStartedEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
-    SetEvent(this->mMainThreadStopedEvent);
-
-    this->mContinueMainThread = FALSE;
+	this->mMainThreadStopedEvent = CreateEvent(NULL, TRUE, TRUE, NULL);		//默认为已触发
 
     this->mMainProc = MainFunc;
     this->mMainProcParam = MainParam;
-
     this->mEndProc = EndFunc;
     this->mEndProcParam = EndParam;
+
     InitializeCriticalSection(&this->mEndLock);
 }
 
@@ -40,25 +38,23 @@ CThread::~CThread(void)
         CloseHandle(this->mStopMainThreadEvent);
         this->mStopMainThreadEvent = NULL;
     }
-
     if (this->mMainThreadStopedEvent)
     {
         CloseHandle(this->mMainThreadStopedEvent);
         this->mMainThreadStopedEvent = NULL;
     }
-
     if (this->mMainThreadStartedEvent)
     {
         CloseHandle(this->mMainThreadStartedEvent);
         this->mMainThreadStartedEvent = NULL;
     }
-
     if (this->mMainThread)
     {
         CloseHandle(this->mMainThread);
         this->mMainThread = NULL;
         this->mMainThreadId = 0;
     }
+
     DeleteCriticalSection(&this->mEndLock);
 }
 
@@ -121,8 +117,6 @@ void CThread::StopMainThread()
 
     //等待退出成功的信号
     WaitForSingleObject(this->mMainThreadStopedEvent, INFINITE);
-
-
 }
 
 DWORD WINAPI CThread::MainThread(LPVOID Lp)

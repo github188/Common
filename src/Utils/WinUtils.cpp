@@ -5,6 +5,8 @@
 #include <WtsApi32.h>
 #include "CTUtils.h"
 #include "Shlwapi.h"
+#include <wbemidl.h>
+#include "VersionHelpers.h"
 
 #define  MODULE_NAME  L"WinUtils"
 
@@ -675,35 +677,43 @@ int CWinUtils::FormatFileSize(ULONGLONG &size, ULONGLONG &tailSize, std::wstring
 	return 0;
 }
 
-bool	CWinUtils::AdjustProcessPrivileges(const std::wstring &privilegesname)
+BOOL CWinUtils::AdjustProcessPrivileges(const WCHAR* privilegesname)
 {
 	HANDLE   hToken = NULL;
 	TOKEN_PRIVILEGES   tkp;
-	bool ret = false;
+	BOOL ret = FALSE;
 
 	do
 	{
 		if (!OpenProcessToken(GetCurrentProcess(),
 			TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
 		{
+			L_ERROR(_T("OpenProcessToken failed %d\n"), GetLastError());
 			break;
 		}
 
-		if (!LookupPrivilegeValueW(NULL, privilegesname.c_str(),
-			&tkp.Privileges[0].Luid))
+		if (!LookupPrivilegeValueW(NULL, privilegesname, &tkp.Privileges[0].Luid))
 		{
+			L_ERROR(_T("LookupPrivilegeValueW failed %d\n"), GetLastError());
 			break;
 		}
 
 		tkp.PrivilegeCount = 1;
 		tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-
 		if (!AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL))
 		{
+			L_ERROR(_T("AdjustTokenPrivileges failed %d\n"), GetLastError());
 			break;
 		}
 
-		ret = true;
+		DWORD dwError = GetLastError();
+		if (ERROR_SUCCESS != dwError)
+		{
+			L_ERROR(_T("AdjustTokenPrivileges failed %d %s\n"), dwError, GetErrorMsg(dwError));
+			break;
+		}
+
+		ret = TRUE;
 	} while (0);
 
 	if (hToken)
@@ -836,6 +846,325 @@ bool CWinUtils::FileExists(const std::wstring &filepath)
 	return (bool)PathFileExists(filepath.c_str());
 }
 
+BOOL CWinUtils::GetSystemUUID(CHAR* uuid)
+{
+	HRESULT Result;
+	IWbemLocator  *WbemLocator = NULL;
+	IWbemServices *WbemServices = NULL;
+	IEnumWbemClassObject * EnumObject = NULL;
+	BOOL bRet = FALSE;
+	ULONG Count = 1;
+	ULONG Returned = 1;
 
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+	Result = CoInitializeSecurity(
+		NULL,                        // Security descriptor    
+		-1,                          // COM negotiates authentication service
+		NULL,                        // Authentication services
+		NULL,                        // Reserved
+		RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication level for proxies
+		RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation level for proxies
+		NULL,                        // Authentication info
+		EOAC_NONE,                   // Additional capabilities of the client or server
+		NULL);                       // Reserved
+	if (FAILED(Result) && Result != RPC_E_TOO_LATE)
+	{
+		L_ERROR(_T("Failed to initialize security. Error code = 0x%x\r\n"), Result);
+		CoUninitialize();
+		return FALSE;                  // Program has failed.
+	}
+
+	Result = CoCreateInstance(CLSID_WbemLocator, 0,
+		CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *)&WbemLocator);
+	if (FAILED(Result))
+	{
+		L_ERROR(_T("Failed to create IWbemLocator object. Err code = 0x%x\r\n"), Result);
+		CoUninitialize();
+		return FALSE;     // Program has failed.
+	}
+
+	// Connect to the root\default namespace with the current user.
+	Result = WbemLocator->ConnectServer(
+		BSTR(L"ROOT\\CIMV2"),  //namespace
+		NULL,                  // User name 
+		NULL,                  // User password
+		0,                     // Locale 
+		NULL,                  // Security flags
+		0,                     // Authority 
+		0,                     // Context object 
+		&WbemServices);        // IWbemServices proxy
+	if (FAILED(Result))
+	{
+		L_ERROR(_T("Could not connect. Error code = 0x%x\r\n"), Result);
+		WbemLocator->Release();
+		CoUninitialize();
+		return FALSE;      // Program has failed.
+	}
+
+	WCHAR strQuery[1024] = { '\0' };
+	wcscpy(strQuery, L"SELECT UUID FROM Win32_ComputerSystemProduct");
+	BSTR strQL = (L"WQL");
+	Result = WbemServices->ExecQuery(strQL, strQuery, WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &EnumObject);
+	if (FAILED(Result))
+	{
+		L_ERROR(_T("ExecQuery Fail %x\r\n"), Result);
+		bRet = FALSE;
+		goto end;
+	}
+
+	IWbemClassObject * ClassObject = NULL;
+	Result = EnumObject->Reset();
+	if (FAILED(Result))
+	{
+		L_ERROR(_T("Could not Enumerate %x\r\n"));
+		bRet = FALSE;
+		goto end;
+	}
+
+	Result = EnumObject->Next(WBEM_INFINITE, Count, &ClassObject, &Returned);
+	if (FAILED(Result))
+	{
+		L_ERROR(_T("Could not Enumerate Next %x\r\n"));
+		bRet = FALSE;
+		goto end;
+	}
+
+	VARIANT v;
+	BSTR ClassPropString = SysAllocString(L"UUID");
+	Result = ClassObject->Get(ClassPropString, 0, &v, 0, 0);
+	SysFreeString(ClassPropString);
+	if (FAILED(Result))
+	{
+		L_ERROR(_T("Could not Get UUID %x\r\n"), Result);
+		bRet = FALSE;
+		goto end;
+	}
+
+	sprintf(uuid, "%S", v.bstrVal);
+	bRet = TRUE;
+
+	VariantClear(&v);
+
+end:
+	WbemServices->Release();
+	WbemLocator->Release();
+	CoUninitialize();
+
+	return bRet;
+}
+
+BOOL CWinUtils::RunApplicationInSession(DWORD sessionId, TCHAR* cmdline, BOOL wait)
+{
+	HANDLE UserToken = NULL;
+	PROCESS_INFORMATION processInfo;
+	SECURITY_ATTRIBUTES sa;
+	STARTUPINFO startUpInfo;
+
+	ZeroMemory(&processInfo, sizeof(PROCESS_INFORMATION));
+	ZeroMemory(&startUpInfo, sizeof(STARTUPINFO));
+	ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	startUpInfo.cb = sizeof(STARTUPINFO);
+
+	if (!WTSQueryUserToken(sessionId, &UserToken))
+	{
+		L_ERROR(_T("WTSQueryUserToken Fail %d\n"), GetLastError());
+		return FALSE;
+	}
+
+	BOOL result = CreateProcessAsUser(UserToken,
+		NULL,
+		cmdline,
+		&sa,
+		&sa,
+		FALSE,
+		0,
+		NULL,
+		NULL,
+		&startUpInfo,
+		&processInfo);
+	if (!result)
+	{
+		L_ERROR(_T("CreateProcessAsUser Fail %d\n"), GetLastError());
+		CloseHandle(UserToken);
+		return FALSE;
+	}
+
+	if (wait)
+	{
+		WaitForSingleObject(processInfo.hProcess, INFINITE);
+	}
+
+	CloseHandle(startUpInfo.hStdInput);
+	CloseHandle(startUpInfo.hStdError);
+	CloseHandle(startUpInfo.hStdOutput);
+	CloseHandle(processInfo.hProcess);
+	CloseHandle(processInfo.hThread);
+	CloseHandle(UserToken);
+
+	return TRUE;
+}
+
+void CWinUtils::LogoffSessionByUsername(CHAR* logoffUsername)
+{
+	WTS_SESSION_INFO *sessionInfo = NULL;
+	DWORD sessionInfoCount;
+	char username[256] = { 0 };
+	LPSTR pBuffer = NULL;
+	DWORD dwBufferLen;
+	BOOL bRet = FALSE;
+
+	BOOL result = WTSEnumerateSessions(WTS_CURRENT_SERVER_HANDLE, 0, 1, &sessionInfo, &sessionInfoCount);
+	unsigned int userCount(0);
+	int num = 0;
+	for (unsigned int i = 0; i < sessionInfoCount; ++i)
+	{
+		if ((sessionInfo[i].State == WTSActive) || (sessionInfo[i].State == WTSDisconnected))
+		{
+			bRet = WTSQuerySessionInformationA(WTS_CURRENT_SERVER_HANDLE, sessionInfo[i].SessionId, WTSUserName, &pBuffer, &dwBufferLen);
+			if (bRet)
+			{
+				strcpy(username, pBuffer);
+				if (strcmp(username, logoffUsername) == 0)
+				{
+					L_INFO(_T("Logoff the %S session %d\n"), username, sessionInfo[i].SessionId);
+
+					//注销会话，阻塞等待完成才返回
+					WTSLogoffSession(WTS_CURRENT_SERVER, sessionInfo[i].SessionId, TRUE);
+				}
+			}
+
+			WTSFreeMemory(pBuffer);
+			userCount++;
+		}
+	}
+	WTSFreeMemory(sessionInfo); //释放  
+}
+
+BOOL CWinUtils::Is64BitOS()
+{
+	SYSTEM_INFO si = { 0 };
+	OSVERSIONINFO osver;
+
+	GetNativeSystemInfo(&si);
+	if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64
+		|| si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+DWORD CWinUtils::GetOSVersion()
+{
+	SYSTEM_INFO si = { 0 };
+	OSVERSIONINFO osver;
+	DWORD dwRet = -1;
+
+	GetNativeSystemInfo(&si);
+
+	if (IsWindows10OrGreater())
+	{
+		if (IsWindowsServer())
+		{
+			dwRet = OS_WIN2012R2;
+		}
+		else
+		{
+			dwRet = OS_WIN10;
+		}
+	}
+	else if (IsWindows8Point1OrGreater())
+	{
+		if (IsWindowsServer())
+		{
+			dwRet = OS_WIN2012R2;
+		}
+		else
+		{
+			dwRet = OS_WIN10;
+		}
+	}
+	else
+	{
+		osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&osver);
+		if (osver.dwPlatformId == VER_PLATFORM_WIN32_NT) {
+			if (osver.dwMajorVersion == 5 && osver.dwMinorVersion == 1) {
+				L_TRACE(_T("windows xp\n"));
+				dwRet = OS_WINXP;
+			}
+			if (osver.dwMajorVersion == 5 && osver.dwMinorVersion == 2) {
+				L_TRACE(_T("windows 2003\n"));
+				dwRet = OS_WIN2003;
+			}
+			if (osver.dwMajorVersion == 6 && osver.dwMinorVersion == 0) {
+				L_TRACE(_T("windows vista or windows 2008\n"));
+				dwRet = OS_WINVISTA;
+			}
+			if (osver.dwMajorVersion == 6 && osver.dwMinorVersion == 1) {
+				L_TRACE(_T("windows 7 or windows 2008 r2\n"));
+				dwRet = OS_WIN7;
+			}
+			if (osver.dwMajorVersion == 6 && osver.dwMinorVersion == 2) {
+				L_TRACE(_T("windows 8 or windows 2012\n"));
+				dwRet = OS_WIN8;
+			}
+			if (osver.dwMajorVersion == 6 && osver.dwMinorVersion == 3) {
+				L_TRACE(_T("windows 8.1 or windows 2012r2\n"));
+				dwRet = OS_WIN81;
+			}
+		}
+	}
+
+	return dwRet;
+}
+
+BOOL CWinUtils::GetSessionToken(DWORD sessionid, HANDLE* userToken)
+{
+	BOOL result = FALSE;
+
+	if (NULL == userToken)
+	{
+		L_ERROR(_T("GetSessionToken Param Error\n"));
+		return FALSE;
+	}
+
+	result = WTSQueryUserToken(sessionid, userToken);
+	if (!result)
+	{
+		L_ERROR(_T("WTSQueryUserToken Fail %d\n"), GetLastError());
+		return FALSE;
+	}
+
+	return result;
+}
+
+BOOL CWinUtils::GetUacTokenForUserToken(HANDLE userToken, HANDLE *uacToken)
+{
+	BOOL result = FALSE;
+	DWORD len = 0;
+
+	if (NULL == userToken)
+	{
+		L_ERROR(_T("GetSessionToken Param Error\n"));
+		return FALSE;
+	}
+
+	result = GetTokenInformation(userToken, TokenLinkedToken, uacToken, sizeof(HANDLE), &len);
+	if (!result)
+	{
+		//某些用户没有uac账户
+		L_WARN(_T("GetTokenInformation Fail %d\n"), GetLastError());
+		*uacToken = NULL;
+		return TRUE;
+	}
+
+	L_TRACE(_T("GetTokenInformation return ret %d handle2 %x Len %d\n"), result, uacToken, len);
+
+	return result;
+}
 
 

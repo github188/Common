@@ -15,6 +15,19 @@ typedef std::wstring tstring;
 #define MAX_SIZE_OF_HOSTNMAE 31
 #endif
 
+//os标志
+#define OS_WINXP         0
+#define OS_WIN2003       1
+#define OS_WINVISTA      2
+#define OS_WIN2008       OS_WINVISTA
+#define OS_WIN7          3
+#define OS_WIN2008R2     OS_WIN7
+#define OS_WIN8          4
+#define OS_WIN2012       OS_WIN8
+#define OS_WIN81         5
+#define OS_WIN2012R2     OS_WIN81
+#define OS_WIN10         OS_WIN81
+
 /** 
  * @class CWinUtils
  * @brief Windows常用操作函数
@@ -137,7 +150,7 @@ public:
 	*
 	* @param[out] path 当前进行所在目录
 	*/
-	static DLL_COMMONLIB_API void WINAPI GetCurrentProcessPath (std::wstring &path);
+	static DLL_COMMONLIB_API void WINAPI GetCurrentProcessPath(std::wstring &path);
 
 	/**
 	* @brief 获取错误信息
@@ -231,7 +244,7 @@ public:
 	*		- 0 成功
 	*		- 其他 失败
 	*/
-	static DLL_COMMONLIB_API bool	WINAPI AdjustProcessPrivileges(const std::wstring &privilegesName);
+	static DLL_COMMONLIB_API BOOL WINAPI AdjustProcessPrivileges(const WCHAR* privilegesName);
 
 	/** @brief 创建文件夹
 	*	@param[in]	path	文件夹路径
@@ -271,6 +284,59 @@ public:
 	*		- false	文件不存在
 	*/
 	static DLL_COMMONLIB_API bool WINAPI FileExists(const std::wstring &filepath);
+
+	/** @brief 获取系统UUID
+	*	@param[in]	uuid	系统uuid
+	*	@return
+	*		- true	成功
+	*		- false	失败
+	*/
+	static DLL_COMMONLIB_API BOOL WINAPI GetSystemUUID(CHAR* uuid);
+
+	/** @brief 以指定用户身份运行程序
+	*	@param[in]	sessionId	会话id
+	*	@param[in]	cmdline	运行程序命令行
+	*	@param[in]	wait	是否等待运行程序执行完成
+	*	@return
+	*		- true	成功
+	*		- false	失败
+	*/
+	static DLL_COMMONLIB_API BOOL WINAPI RunApplicationInSession(DWORD sessionId, TCHAR* cmdline, BOOL wait);
+
+	/** @brief 注销指定用户名的会话
+	*	@param[in]	logoffUsername 用户名
+	*/
+	static DLL_COMMONLIB_API void WINAPI LogoffSessionByUsername(CHAR* logoffUsername);
+
+	/** @brief 当前是否是64位操作系统
+	*	@return
+	*		- true	是
+	*		- false	否
+	*/
+	static DLL_COMMONLIB_API BOOL WINAPI Is64BitOS();
+
+	/** @brief 获取操作系统版本
+	*	@return 操作系统版本，见"os标志"宏定义，如 OS_WINXP
+	*/
+	static DLL_COMMONLIB_API DWORD GetOSVersion();
+
+	/** @brief 获取会话token
+	*	@param[in]	sessionid 会话id
+	*	@param[out]	userToken token
+	*	@return
+	*		- true	成功
+	*		- false	失败
+	*/
+	static DLL_COMMONLIB_API BOOL GetSessionToken(DWORD sessionid, HANDLE* userToken);
+
+	/** @brief 获取 UAC token
+	*	@param[in]	userToken
+	*	@param[out] uacToken
+	*	@return
+	*		- true	成功
+	*		- false	失败
+	*/
+	static DLL_COMMONLIB_API BOOL GetUacTokenForUserToken(HANDLE userToken, HANDLE *uacToken);
 };
 
 #endif

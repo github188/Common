@@ -67,8 +67,6 @@ void TestWinUtils()
 	BOOL bRet = FALSE;
 	DWORD dwRet = 0;
 
-
-
 	//WinUtils
 	int numOfNic = 0;
 	std::vector<BYTE> mac;
@@ -89,9 +87,13 @@ void TestWinUtils()
 	bRet = CWinUtils::IsFullpath(_T("C:\\1.txt"));
 
 	std::wstring userName = _T("");
+	HANDLE userToken;
+	HANDLE uacToken;
 	dwRet = CWinUtils::GetSessionID();
 	if (dwRet > 0)
 	{
+		bRet = CWinUtils::AdjustProcessPrivileges(SE_TCB_NAME);
+		bRet = CWinUtils::GetSessionToken(dwRet, &userToken);
 		bRet = CWinUtils::GetSessionUserName(dwRet, userName);
 	}
 
@@ -104,6 +106,12 @@ void TestWinUtils()
 	std::wstring errorMsg2 = CWinUtils::WIN32_ERROR_STRING;
 
 	bRet =CWinUtils::CreateDirectorys(_T("C:\\2\\3"));
+
+	CHAR uuid[256] = { 0 };
+	bRet = CWinUtils::GetSystemUUID(uuid);
+
+	DWORD dwVer = CWinUtils::GetOSVersion();
+	bRet = CWinUtils::Is64BitOS();
 
 	//StringUtils
 	std::string newS = CStringUtils::ToUpper("helWor");
