@@ -9,6 +9,7 @@
 #include "Utils\MutexUtils.h"
 #include "Service\ServiceUtils.h"
 #include <process.h>
+#include "Thread\ThreadUtils.h"
 
 #define MODULE_NAME		L"TestFunction"
 
@@ -69,7 +70,15 @@ void TestWinUtils()
 	//WinUtils
 	int numOfNic = 0;
 	std::vector<BYTE> mac;
+	CHAR macAddress[256] = {0};
 	bRet = CWinUtils::GetMacAddr(&numOfNic, mac);
+	if (numOfNic == 0 || mac.size() >= 6)
+	{
+		L_ERROR(_T("GetMacAddr numOfNic = %d mac.size = %d\r\n"), numOfNic, mac.size());
+		return;
+	}
+	sprintf_s(macAddress, 256, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2],
+		mac[3], mac[4], mac[5]);
 
 	char hostName[32] = { 0 };
 	bRet = CWinUtils::GetHostname(hostName);
@@ -218,4 +227,9 @@ void TestService()
 	Info.StopFun = CommonTestServiceStop;
 
 	ServiceMain(&Info);
+}
+
+void TestThread()
+{
+	
 }

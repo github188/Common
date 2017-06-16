@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Service">
       <UniqueIdentifier>{c52338a5-2867-47c4-b15c-99b2031be7c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Thread">
+      <UniqueIdentifier>{1bb81b42-98d4-4aa1-95f6-10882bda8606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Thread">
+      <UniqueIdentifier>{395803d1-6bbe-4553-9579-68ff8bcbff8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -102,6 +108,12 @@
     <ClInclude Include="..\src\Service\Service.h">
       <Filter>Source Files\Service</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\Thread\ThreadUtils.h">
+      <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Thread\Thread.h">
+      <Filter>Source Files\Thread</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -145,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Service\Service.cpp">
       <Filter>Source Files\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Thread\Thread.cpp">
+      <Filter>Source Files\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Thread\ThreadUtils.cpp">
+      <Filter>Source Files\Thread</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

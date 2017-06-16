@@ -4,11 +4,11 @@
 #include "stdafx.h"
 #include "TestFunction.h"
 
-#define _TEST_SERVICE_
+//#define _TEST_SERVICE_
 //#define _TEST_LOG_
 //#define _TEST_REG_
 //#define _TEST_WIN_UTILS_
-
+#define _TEST_THREAD_
 
 
 int main()
@@ -30,6 +30,9 @@ int main()
 	TestWinUtils();
 #endif // _TEST_WIN_UTILS
 
+#ifdef _TEST_THREAD_
+	TestThread();
+#endif // _TEST_THREAD_
 
 
 
