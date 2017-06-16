@@ -1,14 +1,14 @@
 #include "Utils\WinUtils.h"
 #include "Utils\StringUtils.h"
-#include <vector>
-#include <string>
+#include "Log\LogBase.h"
 #include <Iphlpapi.h>
 #include <WtsApi32.h>
 #include "CTUtils.h"
 #include "Shlwapi.h"
-#pragma comment (lib,"Shlwapi.lib")
 
-BOOL CWinUtils::GetMacAddr(int *numOfNic, std::vector<BYTE> &mac)
+#define  MODULE_NAME  L"WinUtils"
+
+BOOL CWinUtils::GetMacList(int *numOfNic, std::vector<BYTE> &mac)
 {
 	PIP_ADAPTER_INFO pAdapterInfo = NULL;
 	ULONG ulSizeAdapterInfo = 0;
@@ -25,7 +25,7 @@ BOOL CWinUtils::GetMacAddr(int *numOfNic, std::vector<BYTE> &mac)
 		pAdapterInfo = (PIP_ADAPTER_INFO)malloc(ulSizeAdapterInfo);
 		if (!pAdapterInfo)
 		{
-			//L_FATAL(_T("malloc fail\n"));
+			L_FATAL(_T("malloc fail\n"));
 			return FALSE;
 		}
 		pOriginalPointer = pAdapterInfo;
@@ -34,13 +34,13 @@ BOOL CWinUtils::GetMacAddr(int *numOfNic, std::vector<BYTE> &mac)
 
 	if (dwReturnvalueGetAdapterInfo != NO_ERROR)
 	{
-		//L_WARN(_T("GetAdaptersInfo FAIL:0x%x\n"), GetLastError());
+		L_WARN(_T("GetAdaptersInfo FAIL:0x%x\n"), GetLastError());
 		goto EXIT;
 	}
 
 	if (ulSizeAdapterInfo == 0)
 	{
-		//L_WARN(_T("No found netcard in system\n"));
+		L_WARN(_T("No found netcard in system\n"));
 		goto EXIT;
 	}
 	r = TRUE;
@@ -79,6 +79,103 @@ EXIT:
 	}
 
 	return r;
+}
+
+BOOL CWinUtils::GetMacAddress(WCHAR* mac)
+{
+	int NicNum = 0;
+	std::vector<BYTE> macList;
+
+	if (!GetMacList(&NicNum, macList))
+	{
+		L_ERROR(_T("GetMacList fail %d\r\n"), GetLastError());
+		return FALSE;
+	}
+
+	if (NicNum == 0 && macList.size() >= 6)
+	{
+		L_ERROR(_T("GetMacList NicNum = %d macList.size = %d\r\n"), NicNum, macList.size());
+		return FALSE;
+	}
+
+	swprintf_s(mac, 256, _T("%02x:%02x:%02x:%02x:%02x:%02x"), macList[0], macList[1], macList[2],
+		macList[3], macList[4], macList[5]);
+
+	return TRUE;
+}
+
+void CWinUtils::GetIPList(std::vector<DWORD> &ipList)
+{
+	//初始化Win Socket2
+	WORD            wVersionRequested;
+	WSADATA         wsaData;
+	wVersionRequested = MAKEWORD(2, 2);
+	WSAStartup(wVersionRequested, &wsaData);
+	
+	char hostName[256];
+	ipList.clear();
+	if (gethostname(hostName, 256) == 0)
+	{
+		struct hostent *host;
+		int i;
+
+		host = gethostbyname(hostName);
+		for (i = 0; host != NULL && host->h_addr_list[i] != NULL; i++)
+		{
+			struct in_addr *in = (struct in_addr *)host->h_addr_list[i];
+
+			ipList.push_back(htonl(in->s_addr));
+		}
+	}
+}
+
+BOOL CWinUtils::GetIPAddresss(WCHAR* IP)
+{
+	std::vector<DWORD> ipList;
+	std::vector<DWORD>::iterator Itor;
+	DWORD ip;
+	WCHAR tmp[256];
+	BOOL found = FALSE;
+
+	GetIPList(ipList);
+	if (ipList.empty())
+	{
+		L_ERROR(_T("GetIPList fail %d\r\n"), GetLastError());
+		return FALSE;
+	}
+
+	for (Itor = ipList.begin(); Itor != ipList.end(); Itor++)
+	{
+		ip = *Itor;
+		swprintf_s(tmp, 256, _T("%d.%d.%d.%d"),
+			(ip >> 24) & 0xFF,
+			(ip >> 16) & 0xFF,
+			(ip >> 8) & 0xFF,
+			(ip >> 0) & 0xFF);
+
+		//去掉回环地址
+		if (((ip >> 24) & 0xFF) == 127)
+		{
+			L_ERROR(_T("GetIPList Invalid IP %S\r\n"), tmp);
+			continue;
+		}
+		else
+		{
+			found = TRUE;
+			break;
+		}
+	}
+
+	if (found)
+	{
+		//strncpy(IP, tmp, 256);
+		StrCpyW(IP, tmp);
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
 }
 
 BOOL CWinUtils::GetHostname(char name[MAX_SIZE_OF_HOSTNMAE + 1])

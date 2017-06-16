@@ -31,8 +31,34 @@ public:
 	* @return 成功 TRUE  \n
 	*         失败 FALSE
 	*/
-	static DLL_COMMONLIB_API BOOL WINAPI GetMacAddr(
+	static DLL_COMMONLIB_API BOOL WINAPI GetMacList(
 		int *numOfNic, std::vector<BYTE> &mac);
+
+	/**
+	* @brief 获取单网卡机器的MAC地址
+	*
+	* @param[out] mac      网卡mac地址
+	*
+	* @return 成功 TRUE  \n
+	*         失败 FALSE
+	*/
+	static DLL_COMMONLIB_API BOOL WINAPI GetMacAddress(WCHAR* mac);
+
+	/**
+	* @brief 获取机器ip地址列表
+	*
+	* @param[out] ipList  ip列表
+	*
+	*/
+	static DLL_COMMONLIB_API void WINAPI GetIPList(std::vector<DWORD> &ipList);
+
+	/**
+	* @brief 获取单网卡机器ip地址
+	*
+	* @param[out] IP  ip地址
+	*
+	*/
+	static DLL_COMMONLIB_API BOOL WINAPI GetIPAddresss(WCHAR* IP);
 
 	/**
 	* @brief 获取主机名
