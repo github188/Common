@@ -8,7 +8,7 @@
 
 //#define _TEST_SERVICE_
 //#define _TEST_REG_
-#define _TEST_WIN_UTILS_
+//#define _TEST_WIN_UTILS_
 //#define _TEST_THREAD_
 
 
