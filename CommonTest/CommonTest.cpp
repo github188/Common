@@ -8,7 +8,7 @@
 
 //#define _TEST_SERVICE_
 //#define _TEST_REG_
-//#define _TEST_WIN_UTILS_
+#define _TEST_WIN_UTILS_
 //#define _TEST_THREAD_
 
 
@@ -23,7 +23,7 @@ int main()
 	TestLog();
 #endif // _TEST_LOG_
 
-#ifdef _TEST_LOG_
+#ifdef _TEST_REG_
 	TestReg();
 #endif // _TEST_REG_
 

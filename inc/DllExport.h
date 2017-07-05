@@ -3,14 +3,13 @@
 #ifndef __DLLEXPORT_H__
 #define __DLLEXPORT_H__
 
-#ifdef WIN32
+#ifndef DLL_COMMONLIB_API
 #define DLL_COMMONLIB_API __declspec(dllexport)
-#else
-#define DLL_COMMONLIB_API
+#endif
+
 # ifndef _T
 #  define _T(x) x
 # endif
-#endif
 
 #ifndef __GNUC__
 # define __attribute__(x) /*NOTHING*/
