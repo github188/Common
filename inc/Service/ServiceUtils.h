@@ -23,7 +23,7 @@ typedef BOOL (WINAPI *IServiceFunc)();
  */
 typedef struct
 {
-    BOOL         ConsoloMode;    /** < 控制台模式      */
+    BOOL         ConsoleMode;    /** < 控制台模式      */
     WCHAR*       ServiceName;    /** < 服务名称        */
     WCHAR*       LogConfigPath;  /** < Log配置文件路径 */
     WCHAR*       LogModuleName;  /** < Log的模块名称   */
