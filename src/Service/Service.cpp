@@ -242,7 +242,7 @@ static int ServiceMainProcess(ServiceBaseInfo *service)
 		goto EXIT;
 	}
 
-	if (!service->ConsoloMode)
+	if (!service->ConsoleMode)
 	{
 		WCHAR ServiceName[MAX_PATH];
 

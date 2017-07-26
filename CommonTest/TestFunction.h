@@ -4,4 +4,3 @@ void TestLog();
 void TestReg();
 void TestWinUtils();
 void TestService();
-void TestThread();
