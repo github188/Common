@@ -13,7 +13,7 @@
 
 #define MODULE_NAME		L"TestFunction"
 
-BOOL g_WatchThreadExit = FALSE;
+IThread*	watchRegThread;		//监控注册表变化线程
 
 //日志操作
 void TestLog()
@@ -150,59 +150,65 @@ void TestWinUtils()
 	}
 }
 
-static DWORD WINAPI WatchServiceThread(void *pParam)
+BOOL WatchRegThreadProc(LPVOID pParam, HANDLE stopEvent)
 {
 	DWORD dwRet = -1;
 
-	while (true)
+	while ( true)
 	{
-		if (g_WatchThreadExit)
+		DWORD dwRet = WaitForSingleObject(stopEvent, 1000);
+		switch (dwRet)
 		{
-			L_INFO(L"exit watch thread");
-			goto EXIT;
-		}
-
-		BOOL bRet = CRegOperation::RegReadDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", L"TestDword", &dwRet, 99);
-		if (!bRet || dwRet != 56)
-		{
-			L_INFO(L"dword value not equal 56");
-			bRet = CRegOperation::RegWriteDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", L"TestDword", 56);
-			if (!bRet)
+			case WAIT_TIMEOUT:
 			{
-				L_ERROR(L"set reg fail");
+				BOOL bRet = CRegOperation::RegReadDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", 
+					L"TestDword", &dwRet, 99);
+				if (!bRet || dwRet != 56)
+				{
+					L_INFO(_T("dword value not equal 56\r\n"));
+					bRet = CRegOperation::RegWriteDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\HQW", L"TestDword", 56);
+					if (!bRet)
+					{
+						L_ERROR(_T("set reg fail\r\n"));
+					}
+					else
+					{
+						L_INFO(_T("set reg success\r\n"));
+					}
+				}
+			
+				break;
 			}
-			else
-			{
-				L_INFO(L"set reg success");
-			}
+		
+			default:
+				goto EXIT;
 		}
 
 		Sleep(5000);
 	}
 
 EXIT:
-
-	return dwRet;
+	L_INFO(_T("WatchServiceThread Exit\r\n"));
+	return TRUE;
 }
 
 BOOL WINAPI CommonTestServiceStart()
 {
 	L_TRACE_ENTER();
 
-	g_WatchThreadExit = FALSE;
-	
-	HANDLE hWatchServiceThread = (HANDLE)_beginthreadex(NULL, 0,
-		(unsigned int(__stdcall *)(void *))WatchServiceThread,
-		NULL, 0, NULL);
-	if (hWatchServiceThread == NULL)
+	watchRegThread = CreateIThreadInstance(WatchRegThreadProc, NULL);
+	if (NULL == watchRegThread)
 	{
-		L_ERROR(L"_beginthreadex failed %d", GetLastError());
-		return false;
+		L_ERROR(_T("CreateIThreadInstance failed %d\r\n"), GetLastError());
+		return FALSE;
 	}
-	else
+
+	watchRegThread->StartMainThread();
+
+	if (!watchRegThread->IsMainThreadRunning())
 	{
-		CloseHandle(hWatchServiceThread);
-		hWatchServiceThread = NULL;
+		L_ERROR(_T("IsMainThreadRunning return false"));
+		return FALSE;
 	}
 
 	L_TRACE_LEAVE();
@@ -210,12 +216,15 @@ BOOL WINAPI CommonTestServiceStart()
 	return TRUE;
 }
 
-
 BOOL WINAPI CommonTestServiceStop()
 {
 	L_TRACE_ENTER();
 
-	g_WatchThreadExit = TRUE;
+	if (NULL != watchRegThread)
+	{
+		watchRegThread->StopMainThread();
+		DestoryIThreadInstance(watchRegThread);
+	}
 
 	L_TRACE_LEAVE();
 
@@ -227,7 +236,7 @@ void TestService()
 {
 	ServiceBaseInfo Info;
 
-	Info.ConsoloMode = FALSE;
+	Info.ConsoleMode = FALSE;
 	Info.LogConfigPath = _T("CommonTest_logconf.ini");
 	Info.LogModuleName = _T("CommonTestService");
 	Info.ServiceName = _T("CommonTestService");
@@ -235,9 +244,4 @@ void TestService()
 	Info.StopFun = CommonTestServiceStop;
 
 	ServiceMain(&Info);
-}
-
-void TestThread()
-{
-	
 }
