@@ -381,7 +381,7 @@ void CWinUtils::GetCurrentProcessPath(std::wstring& path)
 	if (GetModuleFileName(NULL, wsPath, MAX_PATH))
 	{
 		path = wsPath;
-		path = path.substr(0, path.find_last_of(L"/\\") + 1);
+		path = path.substr(0, path.find_last_of(L"\\") + 1);
 	}
 }
 
