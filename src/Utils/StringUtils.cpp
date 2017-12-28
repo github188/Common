@@ -224,7 +224,7 @@ void CStringUtils::SplitString(const std::string &srcString, const std::string &
 			}
 			break;
 		}
-		if (tpos != pos)
+		//if (tpos != pos)		//分隔符隔出来的空字符串也取出来
 		{
 			substr = srcString.substr(pos, tpos - pos);
 			strList.push_back(substr);
@@ -252,7 +252,7 @@ void CStringUtils::SplitString(const std::wstring &srcString, const std::wstring
 			}				break;
 		}
 
-		if (tpos != pos)
+		//if (tpos != pos)		//分隔符隔出来的空字符串也取出来
 		{
 			substr = srcString.substr(pos, tpos - pos);
 			strList.push_back(substr);

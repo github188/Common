@@ -11,6 +11,8 @@
 #include <process.h>
 #include "Thread\ThreadUtils.h"
 
+#include <vector>
+
 #define MODULE_NAME		L"TestFunction"
 
 IThread*	watchRegThread;		//监控注册表变化线程
@@ -115,6 +117,10 @@ void TestWinUtils()
 
 	//StringUtils
 	std::string newS = CStringUtils::ToUpper("helWor");
+	std::wstring dsfsd = _T("*XMD*1*1*&17C51-1-9*17C51**650100197452*2017-12-28 10:33:39*90*#");
+	std::vector<std::wstring> vecsssss;
+	CStringUtils::SplitString(dsfsd, _T("*"), vecsssss);
+
 
 	//Base64Utils
 	std::string base64Str = "";
